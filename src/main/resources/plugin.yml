@@ -1,0 +1,110 @@
+name: FactionWP
+version: ${project.version}
+api-version: 1.13
+main: xzot1k.plugins.fwp.FactionWP
+author: XZot1K
+description: Brings a large variety of wands & pickaxes to your server that each have their own unique abilities!
+loadbefore: [ ShopGUIPlus ]
+softdepend: [ Vault, WorldGuard, WorldEdit, Essentials, EssentialsX, Factions, FactionsX, MassiveCore, SuperiorSkyblock2, ASkyBlock,
+              SkyBlock, FabledSkyBlock, GriefPrevention, ShopGUIPlus, CoreProtect, SpartanAPI, mcMMO, WildChests, SilkSpawners, CommandPanels ]
+commands:
+  factionwp:
+    default: op
+permissions:
+  factionwp.admin:
+    default: op
+    description: Gives the player access to all the plugin's features.
+    children:
+      factionwp.give: true
+      factionwp.reload: true
+      factionwp.list: true
+      factionwp.info: true
+      factionwp.all: true
+  factionwp.all:
+    default: op
+    description: Gives the player access to all wands and pickaxes.
+    children:
+      factionwp.sandwand: true
+      factionwp.craftwand: true
+      factionwp.sellwand: true
+      factionwp.lightningwand: true
+      factionwp.smeltwand: true
+      factionwp.harvesterhoe: true
+      factionwp.harvesteraxe: true
+      factionwp.icewand: true
+      factionwp.wallwand: true
+      factionwp.platformwand: true
+      factionwp.traypickaxe: true
+      factionwp.trenchpickaxe: true
+      factionwp.trenchspade: true
+      factionwp.projectilewand: true
+      factionwp.spawnerpickaxe: true
+      factionwp.spawnerpickaxe.all: true
+      factionwp.spawnerpickaxe.natural: true
+      factionwp.spawnerpickaxe.placed: true
+  factionwp.give:
+    default: op
+    description: Allows the sender to use the give command.
+  factionwp.reload:
+    default: op
+    description: Allows the sender to reload all configuration files.
+  factionwp.list:
+    default: op
+    description: Allows the sender to view a list of all available wands and pickaxes.
+  factionwp.info:
+    default: op
+    description: Allows the sender to view the plugins information.
+  factionwp.sandwand:
+    default: op
+    description: Allows the player to use a sand wand.
+  factionwp.craftwand:
+    default: op
+    description: Allows the player to use a craft wand.
+  factionwp.sellwand:
+    default: op
+    description: Allows the player to use a sell wand.
+  factionwp.lightningwand:
+    default: op
+    description: Allows the player to use a lightning wand.
+  factionwp.smeltwand:
+    default: op
+    description: Allows the player to use a smelt wand.
+  factionwp.harvesterhoe:
+    default: op
+    description: Allows the player to use a harvester hoe.
+  factionwp.harvesteraxe:
+    default: op
+    description: Allows the player to use a harvester axe.
+  factionwp.icewand:
+    default: op
+    description: Allows the player to use a ice wand.
+  factionwp.wallwand:
+    default: op
+    description: Allows the player to use the wall wand.
+  factionwp.platformwand:
+    default: op
+    description: Allows the player to use the platform wand.
+  factionwp.traypickaxe:
+    default: op
+    description: Allows the player to use a tray pickaxe.
+  factionwp.trenchpickaxe:
+    default: op
+    description: Allows the player to use a trench pickaxe.
+  factionwp.trenchspade:
+    default: op
+    description: Allows the player to use a trench spade.
+  factionwp.projectilewand:
+    default: op
+    description: Allows the player to use a projectile wand.
+  factionwp.spawnerpickaxe:
+    default: op
+    description: Allows the player to use a spawner pickaxe.
+  factionwp.spawnerpickaxe.all:
+    default: op
+    description: Allows the player to use a spawner pickaxe in all mode.
+  factionwp.spawnerpickaxe.natural:
+    default: op
+    description: Allows the player to use a spawner pickaxe in natural mode.
+  factionwp.spawnerpickaxe.placed:
+    default: op
+    description: Allows the player to use a spawner pickaxe in placed mode.

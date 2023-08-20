@@ -1,0 +1,942 @@
+# Here is where you can customize anything general related.
+general-section:
+  # By enabling this the plugin will not enable without vault installed.
+  # (Note: if you disable this please go through each wand or pickaxe that requires economy and change their economy mode.)
+  use-vault: false
+  # If this is enabled, similar tools can be dragged on to each other inside the inventory to combine usage counts and merge into a single tool.
+  tool-merging: true
+  # If this option is enabled all placed or broken blocks will be logged to CoreProtect.
+  log-core-protect: false
+  # If this is enabled Spartan Anti-Cheat should not flag players for fast clicking.
+  cancel-spartan-click: false
+  # If this is enabled FactionWP will do everything in its power to stop incompatibility between itself and mcMMO.
+  support-mcmmo: false
+  # If these options are enabled, items with custom display names and lore are able to be sold.
+  sell-custom-lore-items: false
+  sell-custom-name-items: false
+
+# This is where you can configure all options that effect all of the wands and pickaxes.
+global-item-section:
+  # If this option is enabled enchantments will be hidden providing only an item glow and a hidden way to detect items.
+  hide-enchantments: true
+  # This is the drop table that is used to simulate drop amount from specific materials.
+  # (Note: This is typically used for materials like redstone or carrots that drop multiple random amounts.)
+  # Format: <Material>:<durability>:<Range-Min,Range-Max>
+  material-drop-table:
+    - "CARROT_ITEM:-1:1,4"
+    - "POTATO_ITEM:-1:1,4"
+    - "NETHER_WARTS:-1:2,4"
+    - "NETHER_WART:-1:2,4"
+    - "REDSTONE:-1:4,5"
+    - "LAPIS_LAZULI:-1:4,8"
+  # If this option is enabled, the plugin will simply add a cosmetic statistic addition to the tool display name.
+  # (Note: Intended for simple quick tool stat identification)
+  suffix-uses: false
+  # The format used for the above option (Only placeholder is {uses}).
+  suffix-use-format: "&6(&aUses: &e{uses}&6)"
+  # If this option is enabled, the plugin will simply add a cosmetic statistic addition to the tool display name.
+  # (Note: Intended for simple quick tool stat identification)
+  prefix-radius: false
+  # The format used for the above option (Only placeholder is {radius}).
+  prefix-radius-format: "&e&l{radius}&r"
+  # This is the format that is used to keep track of the use limit.
+  # (Note: the placeholder '{uses}' will be replaced with the item's uses)
+  uses-format: "&aThis item has &e{uses} &auses remaining."
+  # This is the format that is used to keep track of the price modifier/booster.
+  # (Note: the placeholder '{modifier}' will be replaced with the item's modifier)
+  modifier-format: "&aThis item has &e{modifier}x &aprice modifier/booster."
+  # This is the format that is used to keep track of the radius for a specific type of tool.
+  # (Note: the placeholder '{radius}' will be replaced with the item's radius)
+  radius-format: "&aThis item has a radius of &e{radius}&a."
+  # By enabling this within all tools with a radius will display there area. (For example, '3x3')
+  radius-area-mode: true
+  # If this option is enabled, a block broken count will be implemented on to 'block breaking' based tools.
+  display-block-count: true
+  # This is the format of the count that is added to the tool's lore.
+  # (Note: the placeholder '{count}' will be replaced with the item's block count)
+  block-count-format: "&aThis item has been used to break &e{count} &ablocks."
+  # If this option is enabled, a item sell count will be implemented on to 'item selling' based tools.
+  display-sell-count: true
+  # This is the format of the count that is added to the tool's lore.
+  # (Note: the placeholder '{count}' will be replaced with the item's sell count)
+  sell-format: "&aThis item has sold a total of &e{count} &aitems."
+  # Any of the mode switching features will use these values as the toggle value.
+  enable-placeholder: "Enabled"
+  disabled-placeholder: "Disabled"
+
+# Here is where you can configure specific interactions with other plugins.
+hooks-section:
+  # All materials in this list will be skipped from any type of world modifying tools.
+  blocked-materials:
+    - "SPAWNER"
+  # Here is where you can configure everything related to shop gui plus.
+  shop-gui-plus-hook:
+    # This tells the plugin to sell items at the shop gui prices.
+    # (Note: This is automatic as long as Vault is being used, custom item currency remains the same.)
+    use-shop-gui-plus: false
+  # Here is where you can configure everything related to essentials.
+  essentials-hook:
+    # If this option is enabled, FactionWP will attempt to retrieve item prices from the essentials's worth feature.
+    use-essentials: false
+
+
+# Here is where all features related to the sand wand can be configured.
+# The sand wand's purpose is to remove a set of blocks downwards until it reaches its limit.
+sand-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "BLAZE_ROD"
+    durability: 0
+    display-name: "&d&lSand Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a sand block, 10 blocks of sand located"
+      - "&7directly below will be removed as well."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # This allows the wand to perform the same feature on other materials such as stone, iron blocks, grass, etc.
+  # (Note: If this option is enabled only sand will be effected)
+  only-sand-removal: true
+  # Here is where the materials and durabilites can be set for the option above, if disabled.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  other-materials:
+    - "SAND:0"
+    - "STONE:0"
+    - "WOOL:5"
+  # This is how many blocks can be removed in total. When sand or "other-materials" are selected by the wand X (X being the value below) blocks 
+  # under the clicked block will be removed up to this maximum value as long as each one of the materials is sand or a "other-materials".
+  block-removal-amount: 10
+  # This is how fast each block is removed in ticks. (Note: 20 ticks = 1 second)
+  block-removal-speed: 10
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the craft wand can be configured.
+# The craft wand's purpose is to convert all ingots and nuggets into blocks.
+craft-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&e&lCraft Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a container, all nuggets and ingots"
+      - "&7will be converted into their relative blocks."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # Here is where the container materials can be defined, this allows the wand's effect to access the containers inventory.
+  container-materials:
+    - "LEGACY_CHEST:-1"
+    - "LEGACY_TRAPPED_CHEST:-1"
+    - "LEGACY_DISPENSER:-1"
+    - "CHEST:-1"
+    - "TRAPPED_CHEST:-1"
+    - "DISPENSER:-1"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the craft wand can be configured.
+# The craft wand's purpose is to convert all ingots and nuggets into blocks.
+sell-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&a&lSell Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses. Additionally
+    # the lore can contain {sell-line} to display how many items the tool has sold.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a container, all items"
+      - "&7with prices will be sold."
+      - "&e&m---------------------"
+      - ""
+      - "{modifier-line}"
+      - "{sell-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # This tells the wand when you sell it to give the player a custom item instead of Vault economy.
+  # (Note: This does not include a command or any economy type features. This is strictly for players who use items as economy)
+  custom-item-currency: false
+  # Here is where you can customize the currency item.
+  custom-item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "NETHER_STAR"
+    durability: 0
+    display-name: "&a&lExample Currency Item"
+    lore:
+      - "&e&m---------------------"
+      - "&7This item can be used to purchase things"
+      - "&7inside the server's custom item shop. (Example)"
+      - "&e&m---------------------"
+      - ""
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # Here is where the materials and their prices can be defined.
+  # (Note: each value within the list must contain the material, a colon followed by the durability, and then finally the price
+  # to complete the format <Material>:<Durability>:<price>)
+  material-prices:
+    - "IRON_BLOCK:-1:500.0"
+    - "GOLD_INGOT:-1:30.5"
+    - "DIAMOND_SWORD:-1:50.0"
+  # Here is where the container materials can be defined, this allows the wand's effect to access the containers inventory.
+  container-materials:
+    - "LEGACY_CHEST:-1"
+    - "LEGACY_TRAPPED_CHEST:-1"
+    - "LEGACY_DISPENSER:-1"
+    - "CHEST:-1"
+    - "TRAPPED_CHEST:-1"
+    - "DISPENSER:-1"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the craft wand can be configured (This tool is a Factions feature and requires a Faction plugin).
+# The TNT wand's purpose is to store TNT into a virtual bank which can be withdrawn at any time.
+tnt-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&c&lTNT Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a container, all TNT"
+      - "&7will be stored into the virtual bank of your"
+      - "&7team."
+      - "&e&m---------------------"
+      - ""
+      - "{modifier-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # Here is where the container materials can be defined, this allows the wand's effect to access the containers inventory.
+  container-materials:
+    - "LEGACY_CHEST:-1"
+    - "LEGACY_TRAPPED_CHEST:-1"
+    - "LEGACY_DISPENSER:-1"
+    - "CHEST:-1"
+    - "TRAPPED_CHEST:-1"
+    - "DISPENSER:-1"
+  # This is the withdraw command checked for, the player can enter an additional space and numerical value to provide an amount.
+  withdraw-command: "/f tntbank withdraw"
+  # This is the command checked for when the player needs to check how much TNT the faction has.
+  storage-command: "/f tntbank bal"
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the lightning wand can be configured.
+# The lightning wand's purpose is to convert a creeper into a charged creeper.
+lightning-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "BLAZE_ROD"
+    durability: 0
+    display-name: "&b&lLightning Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a creeper, it will become charged."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the smelt wand can be configured.
+# The smelt wand's purpose is to convert all ores into their smelted forms.
+smelt-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&c&lSmelt Wand"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a container, all ores"
+      - "&7will be converted into their smelted forms."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # These are all the material to material smelting instructions for the wand. Please use the format "<From-Material>:<To-Material>"
+  # (Note: If you are trying to get "LAPIS_LAZULI" in versions under 1.13.x please use my custom material "INK_SAC_4")
+  # (THE ABOVE NOTE WILL NEED TO BE CHANGED FOR 1.8.x-1.12.2)
+  smeltable-list:
+    - "GOLD_ORE:GOLD_INGOT"
+    - "IRON_ORE:IRON_INGOT"
+    - "COAL_ORE:COAL"
+    - "DIAMOND_ORE:DIAMOND"
+    - "EMERALD_ORE:EMERALD"
+    - "REDSTONE_ORE:REDSTONE"
+    - "LAPIS_ORE:LAPIS_LAZULI"
+    - "QUARTZ_ORE:QUARTZ"
+    - "NETHER_QUARTZ_ORE:QUARTZ"
+  # Here is where the container materials can be defined, this allows the wand's effect to access the containers inventory.
+  container-materials:
+    - "LEGACY_CHEST:-1"
+    - "LEGACY_TRAPPED_CHEST:-1"
+    - "LEGACY_DISPENSER:-1"
+    - "CHEST:-1"
+    - "TRAPPED_CHEST:-1"
+    - "DISPENSER:-1"
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the smelt wand can be configured.
+# The ice wand's purpose is to melt all ice into water in a radius.
+ice-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&b&lIce Wand"
+    # This lore must contain a line that is '{use-line}' and '{radius-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction with a block, all ice"
+      - "&7within a radius will be melted."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the smelt wand can be configured.
+# The wall wand's purpose is to build a wall based on the radius near the player.
+wall-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&6&lWall Wand"
+    # This lore must contain a line that is '{use-line}' and '{radius-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction, a wall will be"
+      - "&7built directly based on player's"
+      - "&7direction."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # This the wall length. (Note: This value is from the center block meaning if this value is set to 5 the wall will be built 5 blocks East and West or North and South)
+  wall-length: 5
+  # These are the only materials that can be replaced by blocks from the wall.
+  # (Format: <material>:<durability>)
+  replaceable-materials:
+    - "AIR:-1"
+  # This is the build material that will be used when building the wall.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  build-material: "COBBLESTONE"
+  # This is the durability value for the material that is used typically for things like colored wool in versions under 1.13.
+  build-durability: 0
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the smelt wand can be configured.
+# The platform wand's purpose is to build a platform under the player based on the radius.
+platform-wand-section:
+  # Here is where the look of the wand in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "STICK"
+    durability: 0
+    display-name: "&6&lPlatform Wand"
+    # This lore must contain a line that is '{use-line}' and '{radius-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction, a platform will be"
+      - "&7built directly under the player."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # These are the only materials that can be replaced by blocks from the wall.
+  # (Format: <material>:<durability>)
+  replaceable-materials:
+    - "AIR:0"
+  # This is the build material that will be used when building the wall.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  build-material: "COBBLESTONE"
+  # This is the durability value for the material that is used typically for things like colored wool in versions under 1.13.
+  build-durability: 0
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the projectile wand can be configured.
+# The projectile wand's main purpose is to remove two side blocks based on the player's direction removing three blocks in a line. This
+# is typically used to remove remove blocks around a block without damaging the center.
+projectile-wand-section:
+  # Here is where the look of the pickaxe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "BLAZE_ROD"
+    display-name: "&d&lProjectile Wand"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon interaction the wand releases"
+      - "&7a projectile toward the shooter's"
+      - "&7targeted direction."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # A projectile entity type from this list will be launched upon interaction of the wand at random.
+  # A list of entities can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+  projectile-entities:
+    - "PRIMED_TNT"
+    - "WITHER_SKULL"
+    - "PRIMED_TNT"
+    - "WITHER_SKULL"
+  # Should blocks damaged by the tray pickaxe drop items?
+  # (Note: if the 'item-auto-pickup' option is enabled items will instead be redirected to the player's inventory)
+  drop-items: true
+  # This is how many projectiles will be fired. Avoid setting this to high, the larger the number = the more lag.
+  projectile-amount: 3
+  # Should the projectiles deal damage to entities?
+  deal-damage: true
+  # If this option is enabled, projectile entities will not harm the environment impacted and will be removed on contact.
+  # (Note: the 'drop-items' option must be enabled)
+  projectile-cleanup: true
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 2
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the harvester hoe can be configured.
+# The harvester hoe's purpose is to instantly transfer or sell (based on the mode) all harvested crops.
+harvester-hoe-section:
+  # Here is where the look of the hoe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "DIAMOND_HOE"
+    display-name: "&a&lHarvester Hoe"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses. Additionally
+    # the lore can contain {sell-line} to display how many items the tool has sold.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon harvesting a crop it will either be transferred directly"
+      - "&7to your inventory or sold based on the current mode."
+      - ""
+      - "&c(Right-Click to switch between modes)"
+      - "&e&m---------------------"
+      - ""
+      - "{modifier-line}"
+      - "{sell-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # These are the blocks that can be effected by the harvester hoe. Each material and data has been set to the FULLY grown of each type.
+  # Please use the value -1 to remove a data check from each material.
+  # (Note: For future minecraft versions simply add the new values)
+  effected-crop-blocks:
+    - "BEETROOT_BLOCK:3"
+    - "BEETROOTS:3"
+    - "CACTUS:-1"
+    - "CARROT:7"
+    - "POTATO:7"
+    - "CARROTS:7"
+    - "POTATOES:7"
+    - "POTATOES:8"
+    - "CHORUS_PLANT:-1"
+    - "CROPS:7"
+    - "WHEAT:7"
+    - "NETHER_WARTS:-1"
+    - "NETHER_WART:3"
+    - "SUGAR_CANE_BLOCK:-1"
+    - "SUGAR_CANE:-1"
+  # If this option is enabled materials like carrot, potato, nether warts, and crops will have their drops
+  # simulated as if it was broken normally in default minecraft. For Example, a carrot crop is suppose to drop 1-4 carrots,
+  # therefore with this option all similar materials will generate in a similar way.
+  generate-random-stacks: true
+  # This value is used when a player harvests blocks like sugar cane, cactus, and chorus. When the block is broken it will execute
+  # the harvester hoe's effects on the blocks above it first. Of course, it will stop when it reaches the defined limit below.
+  plant-stackable-constraint: 50
+  # This tells the hoe when you sell it to give the player a custom item instead of Vault economy.
+  # (Note: This does not include a command or any economy type features. This is strictly for players who use items as economy)
+  custom-item-currency: false
+  # If this option is enabled, the harvester hoe will attempt to replant the harvested material.
+  replant: true
+  # Here is where you can customize the currency item.
+  custom-item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "NETHER_STAR"
+    durability: 0
+    display-name: "&a&lExample Currency Item"
+    lore:
+      - "&e&m---------------------"
+      - "&7This item can be used to purchase things"
+      - "&7inside the server's custom item shop. (Example)"
+      - "&e&m---------------------"
+      - ""
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # Here is where the materials and their prices can be defined.
+  # (Note: each value within the list must contain the material, a colon followed by the durability, and then finally the price
+  # to complete the format <Material>:<Durability>:<price>)
+  material-prices:
+    - "WHEAT:0:2.0"
+    - "CARROT_ITEM:0:3.2"
+    - "POTATO_ITEM:0:3.2"
+    - "NETHER_WARTS:0:2.5"
+    - "NETHER_WART:0:2.5"
+    - "CHORUS_FRUIT:0:4.0"
+    - "CACTUS:0:4.5"
+    - "SUGAR_CANE:0:4.0"
+    - "BEETROOT:0:2.5"
+  # This is where commands can be defined to run at the end of the harvester hoe's action. The following placeholder's can be used:
+  # {player} -> player's name.
+  # {uuid} -> player's UUID.
+  # {total-items} -> total items collected or sold.
+  # {total-earnings} -> total amount earned (If Sell Mode).
+  # FORMAT: <COMMAND>:<PLAYER/CONSOLE>
+  finish-commands: [ ]
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the hoe's cooldown in seconds. The player must wait x seconds before using this hoe again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the harvester axe can be configured.
+# The harvester axe's purpose is to instantly transfer or sell (based on the mode) harvested melons or pumpkins.
+harvester-axe-section:
+  # Here is where the look of the axe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "DIAMOND_AXE"
+    display-name: "&a&lHarvester Axe"
+    # This lore must contain a line that is '{use-line}' as this line is used to keep track of item uses. Additionally
+    # the lore can contain {sell-line} to display how many items the tool has sold.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon harvesting a melon or pumpkin it will either be transferred directly"
+      - "&7to your inventory or sold based on the current mode."
+      - ""
+      - "&c(Right-Click to switch between modes)"
+      - "&e&m---------------------"
+      - ""
+      - "{modifier-line}"
+      - "{sell-line}"
+      - "{block-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # This tells the axe when you sell it to give the player a custom item instead of Vault economy.
+  # (Note: This does not include a command or any economy type features. This is strictly for players who use items as economy)
+  custom-item-currency: false
+  # Here is where you can customize the currency item.
+  custom-item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "NETHER_STAR"
+    durability: 0
+    display-name: "&a&lExample Currency Item"
+    lore:
+      - "&e&m---------------------"
+      - "&7This item can be used to purchase things"
+      - "&7inside the server's custom item shop. (Example)"
+      - "&e&m---------------------"
+      - ""
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    # (Note: If silk touch is on this item the entire block of melon will be dropped.)
+    enchantments:
+      - "DURABILITY:10"
+  # Here is where the materials and their prices can be defined.
+  # (Note: each value within the list must contain the material, a colon followed by the durability, and then finally the price
+  # to complete the format <Material>:<Durability>:<price>)
+  material-prices:
+    - "MELON_SLICE:-1:2.0"
+    - "MELON:-1:3.0"
+    - "PUMPKIN:-1:4.5"
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the axe's cooldown in seconds. The player must wait x seconds before using this axe again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the tray pickaxe can be configured.
+# The tray pickaxe's main purpose is to remove two side blocks based on the player's direction removing three blocks in a line. This
+# is typically used to remove remove blocks around a block without damaging the center.
+tray-pickaxe-section:
+  # Here is where the look of the pickaxe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "DIAMOND_PICKAXE"
+    display-name: "&c&lTray Pickaxe"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon breaking a obsidian block, based on"
+      - "&7the player's direction two netherrack blocks on either side"
+      - "&7of the broken block will be removed as well."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{block-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # If the player mines one of these materials, the plugin will perform the tray pickaxe action at the location.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  trigger-materials:
+    - "COBBLESTONE:-1"
+    - "STONE:-1"
+    - "OBSIDIAN:-1"
+  # These are the materials in the radius that will be removed when the action is triggered.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  removable-materials:
+    - "IRON_ORE:-1"
+    - "SAND:-1"
+    - "DIRT:-1"
+    - "NETHERRACK:-1"
+    - "COBBLESTONE:-1"
+    - "STONE:-1"
+    - "OBSIDIAN:-1"
+  # Should blocks damaged by the tray pickaxe drop items?
+  # (Note: if the 'item-auto-pickup' option is enabled items will instead be redirected to the player's inventory)
+  drop-items: true
+  # Should drop items be automatically added to the player's inventory?
+  # (Note: the 'drop-items' option must be enabled)
+  item-auto-pickup: false
+  # If this is enabled the block mined with the tray pickaxe will remain, while the rest are broken.
+  keep-center-block: true
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the trench pickaxe can be configured.
+# The trench pickaxe's main purpose is to remove a single block with all blocks surrounding it. This pickaxe is typically used
+# for tunneling through solid pickaxe related blocks.
+trench-pickaxe-section:
+  # Here is where the look of the pickaxe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "DIAMOND_PICKAXE"
+    display-name: "&a&lTrench Pickaxe"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon breaking a block, based on"
+      - "&7the player's direction a specific radius of blocks"
+      - "&7around it will be broken as well."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{block-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # Materials within this list will not be effected by the trench pickaxe in any way, shape, or form.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  non-effected-materials:
+    - "BEDROCK:-1"
+    - "OBSIDIAN:-1"
+    - "AIR:-1"
+  # Should blocks damaged by the trench pickaxe drop items?
+  # (Note: if the 'item-auto-pickup' option is enabled items will instead be redirected to the player's inventory)
+  drop-items: true
+  # Should drop items be automatically added to the player's inventory?
+  # (Note: the 'drop-items' option must be enabled)
+  item-auto-pickup: false
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the trench shovel can be configured.
+# The trench pickaxe's main purpose is to remove a single block with all blocks surrounding it. This shovel is typically used
+# for tunneling through shovel related materials.
+trench-shovel-section:
+  # Here is where the look of the shovel in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    # (Note: If running on lower version other than 1.13 the default material is 'DIAMOND_SPADE')
+    material: "DIAMOND_SHOVEL"
+    display-name: "&a&lTrench Shovel"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon breaking a block, based on"
+      - "&7the player's direction a specific radius of blocks"
+      - "&7around it will be broken as well."
+      - "&e&m---------------------"
+      - ""
+      - "{radius-line}"
+      - "{block-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # Materials within this list will not be effected by the trench shovel in any way, shape, or form.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  non-effected-materials:
+    - "BEDROCK:-1"
+    - "OBSIDIAN:-1"
+    - "AIR:-1"
+    - "STONE:-1"
+  # Should blocks damaged by the trench shovel drop items?
+  # (Note: if the 'item-auto-pickup' option is enabled items will instead be redirected to the player's inventory)
+  drop-items: true
+  # Should drop items be automatically added to the player's inventory?
+  # (Note: the 'drop-items' option must be enabled)
+  item-auto-pickup: false
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the shovel's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the multi-tool can be configured.
+# The multi-tool's main purpose is to combine three tool into one and swap between the required materials based on the interacted block.
+# (NOTE: The starting material will determine the other tool forms material. As an example, diamond will mean all three tools will be diamond)
+multi-tool-section:
+  # Here is where the look of the pickaxe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    material: "DIAMOND_PICKAXE"
+    display-name: "&b&lMulti-Tool"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7This tool will change based"
+      - "&7on the mined block material."
+      - "&e&m---------------------"
+      - ""
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+      - "DIG_SPEED:2"
+  # If enabled, this feature will instead make each block broken reduce the durability of the tool instead of each time it swaps materials.
+  alternative-durability-usage: false
+  # Materials within this list will swap the tool to the pickaxe form. Materials can be generalized for example use LOG to refer to all logs.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  pickaxe-swap-materials:
+    - "STONE:-1"
+    - "ORE:-1"
+    - "BLOCK:-1"
+    - "OBSIDIAN:-1"
+    - "NETHER:-1"
+  # Materials within this list will swap the tool to the pickaxe form. Materials can be generalized for example use LOG to refer to all logs.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  axe-swap-materials:
+    - "LOG:-1"
+    - "WOOD:-1"
+    - "FENCE:-1"
+  # Materials within this list will swap the tool to the pickaxe form. Materials can be generalized for example use LOG to refer to all logs.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  shovel-swap-materials:
+    - "DIRT:-1"
+    - "GRASS:-1"
+    - "GRASS_BLOCK:-1"
+    - "SAND:-1"
+  # Materials within this list will swap the tool to the hoe form. Materials can be generalized for example use LOG to refer to all logs.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  hoe-swap-materials:
+    - "HAY:-1"
+    - "LEAVES:-1"
+  # Materials within this list will swap the tool to the sword form. Materials can be generalized for example use LOG to refer to all logs.
+  # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
+  sword-swap-materials:
+    - "WEB:-1"
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
+
+# Here is where all features related to the spawner pickaxe can be configured.
+# The spawner pickaxe's main purpose is to remove a single block with all blocks surrounding it. This pickaxe is used to
+# obtain spawners as placeable blocks (Support SilkSpawners).
+spawner-pickaxe-section:
+  # Here is where the look of the pickaxe in-game can be configured entirely.
+  # A list of materials can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  item:
+    # material, durability, display-name, and lore are all self-explanatory if you need help feel free to contact the developer.
+    # It is recommended to use a tool that can actually break spawners normally.
+    material: "DIAMOND_PICKAXE"
+    display-name: "&6&lSpawner Pickaxe"
+    # This lore must contain a line that is '{use-line}', '{radius-line}', and '{block-line}' as this is how information is retrieved from the tool.
+    lore:
+      - "&e&m---------------------"
+      - "&7Upon breaking a spawner, the"
+      - "&7spawner will become obtainable."
+      - "&e&m---------------------"
+      - ""
+      - "{block-line}"
+      - "{uses-line}"
+    # The format for this is <Enchantment>:<Level>. (Note: This does accept unsafe enchantments)
+    # You can find all enchantments here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+    enchantments:
+      - "DURABILITY:10"
+  # These are the modes the spawner pickaxe can be set into (here for translation & naming purposes).
+  modes:
+    all: "All"
+    natural: "Natural"
+    placed: "Placed"
+  # Should blocks damaged by the trench pickaxe drop items?
+  # (Note: if the 'item-auto-pickup' option is enabled items will instead be redirected to the player's inventory)
+  drop-items: true
+  # Should drop items be automatically added to the player's inventory?
+  # (Note: the 'drop-items' option must be enabled)
+  item-auto-pickup: false
+  # If this is enabled the player will be put on the global cooldown for the cooldown value list below. During this time the player may not
+  # use any other tools that are also on the global cooldown until the duration has expired.
+  use-global-cooldown: false
+  # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
+  # (Note: Set this value to -1 to disable)
+  cooldown: 3
+  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
+  #command-panel-open: ""
