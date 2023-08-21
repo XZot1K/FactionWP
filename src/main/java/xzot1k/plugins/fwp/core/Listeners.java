@@ -100,12 +100,12 @@ public class Listeners implements Listener {
                     if (args.length > 1) {
                         switch (args[1].toLowerCase()) {
                             case "player": {
-                                pluginInstance.getServer().dispatchCommand(e.getPlayer(), commandLine.replace("{player}", e.getPlayer().getName())
+                                pluginInstance.getServer().dispatchCommand(e.getPlayer(), args[0].replace("{player}", e.getPlayer().getName())
                                         .replace("{uuid}", e.getPlayer().getUniqueId().toString()));
                                 continue;
                             }
                             case "chat": {
-                                e.getPlayer().chat(commandLine.replace("{player}", e.getPlayer().getName())
+                                e.getPlayer().chat(args[0].replace("{player}", e.getPlayer().getName())
                                         .replace("{uuid}", e.getPlayer().getUniqueId().toString()));
                                 continue;
                             }
