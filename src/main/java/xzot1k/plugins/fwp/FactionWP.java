@@ -28,7 +28,7 @@ public class FactionWP extends JavaPlugin {
     private static FactionWP pluginInstance;
     private String serverVersion;
     private Manager manager;
-    private boolean prismaInstalled, essentialsInstalled, commandPanelsInstalled;
+    private boolean prismaInstalled, essentialsInstalled;
 
     private FileConfiguration langConfig, dataConfig;
     private File langFile, dataFile;
@@ -88,7 +88,6 @@ public class FactionWP extends JavaPlugin {
         if (silkSpawners != null && silkSpawners.getDescription().getMain().equals("de.dustplanet.silkspawners.SilkSpawners"))
             silkSpawnersHandler = new SilkSpawnersHandler(this, silkSpawners);
 
-        this.commandPanelsInstalled = (getServer().getPluginManager().getPlugin("CommandPanels") != null);
         // loadSpawnerLocations();
 
         log(Level.INFO, "Version " + getDescription().getVersion() + " has been successfully loaded!");
@@ -439,7 +438,4 @@ public class FactionWP extends JavaPlugin {
     public boolean isEssentialsInstalled() {return essentialsInstalled;}
 
     public SilkSpawnersHandler getSilkSpawnersHandler() {return silkSpawnersHandler;}
-
-    public boolean isCommandPanelsInstalled() {return commandPanelsInstalled;}
-
 }

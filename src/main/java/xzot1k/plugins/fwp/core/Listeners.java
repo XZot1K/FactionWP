@@ -32,6 +32,7 @@ import xzot1k.plugins.fwp.core.utils.FunctionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class Listeners implements Listener {
 
@@ -92,13 +93,29 @@ public class Listeners implements Listener {
 
             checkSpartan(e.getPlayer());
 
-            if (pluginInstance.isCommandPanelsInstalled()) {
-                String panelName = pluginInstance.getConfig().getString(wpType.name().toLowerCase().replace("_", "-"));
-                if (panelName != null && !panelName.isEmpty()) {
-                    me.rockyhawk.commandpanels.api.CommandPanelsAPI api = me.rockyhawk.commandpanels.CommandPanels.getAPI();
-                    me.rockyhawk.commandpanels.api.Panel panel = api.getPanel(panelName);
-                    if (panel != null) panel.open(e.getPlayer(), me.rockyhawk.commandpanels.openpanelsmanager.PanelPosition.Top);
+            List<String> commandList = pluginInstance.getConfig().getStringList(wpType.name().toLowerCase().replace("_", "-") + "-section.commands");
+            if (!commandList.isEmpty()) for (String commandLine : commandList) {
+                if (commandLine.contains(":")) {
+                    String[] args = commandLine.split(":");
+                    if (args.length > 1) {
+                        switch (args[1].toLowerCase()) {
+                            case "player": {
+                                pluginInstance.getServer().dispatchCommand(e.getPlayer(), commandLine.replace("{player}", e.getPlayer().getName())
+                                        .replace("{uuid}", e.getPlayer().getUniqueId().toString()));
+                                continue;
+                            }
+                            case "chat": {
+                                e.getPlayer().chat(commandLine.replace("{player}", e.getPlayer().getName())
+                                        .replace("{uuid}", e.getPlayer().getUniqueId().toString()));
+                                continue;
+                            }
+                            default: {break;}
+                        }
+                    }
                 }
+
+                pluginInstance.getServer().dispatchCommand(pluginInstance.getServer().getConsoleSender(),
+                        commandLine.replace("{player}", e.getPlayer().getName()).replace("{uuid}", e.getPlayer().getUniqueId().toString()));
             }
 
             ToolUseEvent toolUseEvent;

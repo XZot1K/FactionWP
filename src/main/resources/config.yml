@@ -122,8 +122,10 @@ sand-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the craft wand can be configured.
 # The craft wand's purpose is to convert all ingots and nuggets into blocks.
@@ -161,8 +163,10 @@ craft-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the craft wand can be configured.
 # The craft wand's purpose is to convert all ingots and nuggets into blocks.
@@ -229,8 +233,10 @@ sell-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the craft wand can be configured (This tool is a Factions feature and requires a Faction plugin).
 # The TNT wand's purpose is to store TNT into a virtual bank which can be withdrawn at any time.
@@ -274,8 +280,10 @@ tnt-wand-section:
   withdraw-command: "/f tntbank withdraw"
   # This is the command checked for when the player needs to check how much TNT the faction has.
   storage-command: "/f tntbank bal"
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the lightning wand can be configured.
 # The lightning wand's purpose is to convert a creeper into a charged creeper.
@@ -304,8 +312,10 @@ lightning-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the smelt wand can be configured.
 # The smelt wand's purpose is to convert all ores into their smelted forms.
@@ -353,8 +363,10 @@ smelt-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the smelt wand can be configured.
 # The ice wand's purpose is to melt all ice into water in a radius.
@@ -385,8 +397,10 @@ ice-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the smelt wand can be configured.
 # The wall wand's purpose is to build a wall based on the radius near the player.
@@ -429,8 +443,10 @@ wall-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the smelt wand can be configured.
 # The platform wand's purpose is to build a platform under the player based on the radius.
@@ -470,8 +486,10 @@ platform-wand-section:
   # This is the wand's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the projectile wand can be configured.
 # The projectile wand's main purpose is to remove two side blocks based on the player's direction removing three blocks in a line. This
@@ -519,8 +537,10 @@ projectile-wand-section:
   # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 2
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the harvester hoe can be configured.
 # The harvester hoe's purpose is to instantly transfer or sell (based on the mode) all harvested crops.
@@ -621,8 +641,10 @@ harvester-hoe-section:
   # This is the hoe's cooldown in seconds. The player must wait x seconds before using this hoe again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the harvester axe can be configured.
 # The harvester axe's purpose is to instantly transfer or sell (based on the mode) harvested melons or pumpkins.
@@ -684,8 +706,10 @@ harvester-axe-section:
   # This is the axe's cooldown in seconds. The player must wait x seconds before using this axe again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the tray pickaxe can be configured.
 # The tray pickaxe's main purpose is to remove two side blocks based on the player's direction removing three blocks in a line. This
@@ -742,8 +766,10 @@ tray-pickaxe-section:
   # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the trench pickaxe can be configured.
 # The trench pickaxe's main purpose is to remove a single block with all blocks surrounding it. This pickaxe is typically used
@@ -788,8 +814,10 @@ trench-pickaxe-section:
   # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the trench shovel can be configured.
 # The trench pickaxe's main purpose is to remove a single block with all blocks surrounding it. This shovel is typically used
@@ -836,8 +864,10 @@ trench-shovel-section:
   # This is the shovel's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the multi-tool can be configured.
 # The multi-tool's main purpose is to combine three tool into one and swap between the required materials based on the interacted block.
@@ -894,8 +924,10 @@ multi-tool-section:
   # (Note: each value within the list must contain the material, a colon, and then the durability to complete the format <Material>:<Durability>)
   sword-swap-materials:
     - "WEB:-1"
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
 
 # Here is where all features related to the spawner pickaxe can be configured.
 # The spawner pickaxe's main purpose is to remove a single block with all blocks surrounding it. This pickaxe is used to
@@ -938,5 +970,7 @@ spawner-pickaxe-section:
   # This is the pickaxe's cooldown in seconds. The player must wait x seconds before using this tool again.
   # (Note: Set this value to -1 to disable)
   cooldown: 3
-  # This will cause the tool to open a panel/GUI from the CommandPanels plugin when right-clicked. Uncomment the line below:
-  #command-panel-open: ""
+  # These commands will execute upon right-clicking with the tool.
+  # (NOTE: End each command with :PLAYER, :CONSOLE, or :CHAT to specify how the command will be ran)
+  # Available placeholders are {player} and {uuid}.
+  commands: [ ]
