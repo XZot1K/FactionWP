@@ -28,7 +28,7 @@ public class FactionWP extends JavaPlugin {
     private static FactionWP pluginInstance;
     private String serverVersion;
     private Manager manager;
-    private boolean prismaInstalled, essentialsInstalled;
+    private boolean prismaInstalled, essentialsInstalled, placeholderAPIInstalled;
 
     private FileConfiguration langConfig, dataConfig;
     private File langFile, dataFile;
@@ -44,6 +44,7 @@ public class FactionWP extends JavaPlugin {
         setServerVersion(getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3]);
         setPrismaInstalled(getServer().getPluginManager().getPlugin("Prisma") != null);
         this.essentialsInstalled = (getServer().getPluginManager().getPlugin("Essentials") != null);
+        this.placeholderAPIInstalled = (getServer().getPluginManager().getPlugin("PlaceHolderAPI") != null);
 
         File file = new File(getDataFolder(), "/config.yml");
         if (file.exists()) {
@@ -438,4 +439,8 @@ public class FactionWP extends JavaPlugin {
     public boolean isEssentialsInstalled() {return essentialsInstalled;}
 
     public SilkSpawnersHandler getSilkSpawnersHandler() {return silkSpawnersHandler;}
+
+    public boolean isPlaceholderAPIInstalled() {
+        return placeholderAPIInstalled;
+    }
 }

@@ -109,9 +109,10 @@ public class FunctionUtil {
         int blockRemovalAmount = pluginInstance.getConfig().getInt("sand-wand-section.block-removal-amount"),
                 removalSpeed = pluginInstance.getConfig().getInt("sand-wand-section.block-removal-speed");
         boolean onlyRemoveSand = pluginInstance.getConfig().getBoolean("sand-wand-section.only-sand-removal");
-        if ((onlyRemoveSand && clickedBlock.getType() == Material.SAND)
-                || (!onlyRemoveSand && pluginInstance.getManager().isInList(clickedBlock.getType(),
-                clickedBlock.getData(), "sand-wand-section.other-materials"))) {
+        if ((onlyRemoveSand && clickedBlock.getType() == Material.SAND) || (!onlyRemoveSand && pluginInstance.getManager().isInList(clickedBlock.getType(),
+                clickedBlock.getData(), "sand-wand-section.other-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"),
+                pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials")))) {
 
             clickedBlock.getWorld().playSound(clickedBlock.getLocation(), (pluginInstance.getServerVersion().startsWith("v1_9") || pluginInstance.getServerVersion().startsWith("v1_10")
                     || pluginInstance.getServerVersion().startsWith("v1_11") || pluginInstance.getServerVersion().startsWith("v1_12")
@@ -134,7 +135,9 @@ public class FunctionUtil {
                     location.add(0, -1, 0);
                     if ((onlyRemoveSand && location.getBlock().getType() == Material.SAND)
                             || (!onlyRemoveSand && pluginInstance.getManager().isInList(location.getBlock().getType(),
-                            location.getBlock().getData(), "sand-wand-section.other-materials"))) {
+                            location.getBlock().getData(), "sand-wand-section.other-materials",
+                            pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"),
+                            pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials")))) {
                         if (!pluginInstance.getManager().isLocationSafe(location, player, false, false, null))
                             return;
 
@@ -192,7 +195,9 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "craft-wand-section.container-materials") && clickedBlock.getState() instanceof InventoryHolder) {
+        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "craft-wand-section.container-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
+                && clickedBlock.getState() instanceof InventoryHolder) {
             InventoryHolder inventoryHolder = (InventoryHolder) clickedBlock.getState();
             HashMap<Material, Integer> materialCountingMap = new HashMap<>(), blockAdditionMap = new HashMap<>();
             int totalBlocksCrafted = 0, totalMaterialsConsumed = 0;
@@ -277,7 +282,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "sell-wand-section.container-materials")
+        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "sell-wand-section.container-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                 && clickedBlock.getState() instanceof InventoryHolder) {
             boolean sellNameItems = pluginInstance.getConfig().getBoolean("general-section.sell-custom-name-items"),
                     sellLoreItems = pluginInstance.getConfig().getBoolean("general-section.sell-custom-lore-items");
@@ -391,7 +397,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "smelt-wand-section.container-materials")
+        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "smelt-wand-section.container-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                 && clickedBlock.getState() instanceof InventoryHolder) {
             InventoryHolder inventoryHolder = (InventoryHolder) clickedBlock.getState();
             HashMap<String, Integer> materialCountingMap = new HashMap<>(), itemAdditionMap = new HashMap<>();
@@ -507,7 +514,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "tnt-wand-section.container-materials")
+        if (pluginInstance.getManager().isInList(clickedBlock.getType(), clickedBlock.getData(), "tnt-wand-section.container-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                 && clickedBlock.getState() instanceof InventoryHolder) {
             long totalFoundTnt = 0;
             InventoryHolder inventoryHolder = (InventoryHolder) clickedBlock.getState();
@@ -680,13 +688,17 @@ public class FunctionUtil {
             return;
         }
 
+        boolean blacklist = pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"),
+                looseCheck = pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials");
+
         final int durability = pluginInstance.getConfig().getInt("wall-wand-section.build-durability"), itemRadius = pluginInstance.getManager().getItemRadius(handItemStack),
                 wallLength = pluginInstance.getConfig().getInt("wall-wand-section.wall-length");
         for (int i = -1; ++i < itemRadius; )
             for (int j = -1; ++j < wallLength; ) {
                 Block currentBlockPositive = (blockFace == BlockFace.EAST || blockFace == BlockFace.WEST) ? centerBlock.getRelative(0, i, j) : centerBlock.getRelative(j, i, 0);
                 if (pluginInstance.getManager().isLocationSafe(currentBlockPositive.getLocation(), player, false, true, material)
-                        && pluginInstance.getManager().isInList(currentBlockPositive.getType(), currentBlockPositive.getData(), "wall-wand-section.replaceable-materials")) {
+                        && pluginInstance.getManager().isInList(currentBlockPositive.getType(), currentBlockPositive.getData(),
+                        "wall-wand-section.replaceable-materials", blacklist, looseCheck)) {
                     pluginInstance.getManager().logToCoreProtect(player, currentBlockPositive, true, false);
                     currentBlockPositive.setType(Objects.requireNonNull(material));
                     if (!pluginInstance.getServerVersion().startsWith("v1_13") && !pluginInstance.getServerVersion().startsWith("v1_14") && !pluginInstance.getServerVersion().startsWith("v1_15"))
@@ -704,7 +716,7 @@ public class FunctionUtil {
                         : centerBlock.getRelative(-j, i, 0);
                 if (pluginInstance.getManager().isLocationSafe(currentBlockNegative.getLocation(), player, false, true, material)
                         && pluginInstance.getManager().isInList(currentBlockNegative.getType(),
-                        currentBlockNegative.getData(), "wall-wand-section.replaceable-materials")) {
+                        currentBlockNegative.getData(), "wall-wand-section.replaceable-materials", blacklist, looseCheck)) {
                     pluginInstance.getManager().logToCoreProtect(player, currentBlockNegative, true, false);
                     currentBlockNegative.setType(material);
 
@@ -755,8 +767,8 @@ public class FunctionUtil {
             }
         }
 
-        Material material = Material.getMaterial(pluginInstance.getConfig()
-                .getString("platform-wand-section.build-material").toUpperCase().replace(" ", "_").replace("-", "_"));
+        Material material = Material.getMaterial(Objects.requireNonNull(pluginInstance.getConfig()
+                .getString("platform-wand-section.build-material")).toUpperCase().replace(" ", "_").replace("-", "_"));
         Block centerBlock = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
         if (!pluginInstance.getManager().isLocationSafe(centerBlock.getLocation(), player, false, true, material)) {
             pluginInstance.getManager().sendCustomMessage(player, "hook-fail-message");
@@ -770,8 +782,8 @@ public class FunctionUtil {
             for (int z = ((-itemRadius) - 1); ++z <= itemRadius; ) {
                 Block currentBlock = centerBlock.getRelative(x, 0, z);
                 if (pluginInstance.getManager().isLocationSafe(currentBlock.getLocation(), player, false, true, material)
-                        && pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(),
-                        "platform-wand-section.replaceable-materials")) {
+                        && pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "platform-wand-section.replaceable-materials",
+                        pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))) {
                     pluginInstance.getManager().logToCoreProtect(player, currentBlock, true, false);
                     currentBlock.setType(material);
 
@@ -820,7 +832,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(block.getType(), block.getData(), "harvester-hoe-section.effected-crop-blocks")) {
+        if (pluginInstance.getManager().isInList(block.getType(), block.getData(), "harvester-hoe-section.effected-crop-blocks",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))) {
             if (!pluginInstance.getManager().isLocationSafe(block.getLocation(), player, true, false, block.getType())) {
                 pluginInstance.getManager().sendCustomMessage(player, "hook-fail-message");
                 return;
@@ -1165,7 +1178,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (pluginInstance.getManager().isInList(block.getType(), block.getData(), "tray-pickaxe-section.trigger-materials")) {
+        if (pluginInstance.getManager().isInList(block.getType(), block.getData(), "tray-pickaxe-section.trigger-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))) {
             if (!pluginInstance.getManager().isLocationSafe(block.getLocation(), player, true, false, block.getType())) {
                 pluginInstance.getManager().sendCustomMessage(player, "hook-fail-message");
                 return;
@@ -1185,13 +1199,14 @@ public class FunctionUtil {
                     Block currentBlock = block.getRelative(x, 0, z);
                     if (keepCenterBlock && currentBlock.getX() == block.getX() && currentBlock.getZ() == block.getZ())
                         continue;
-                    if (pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(),
-                            "tray-pickaxe-section.removable-materials")
+                    if (pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "tray-pickaxe-section.removable-materials",
+                            pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"),
+                            pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                             && pluginInstance.getManager().isLocationSafe(currentBlock.getLocation(), player, true, false, currentBlock.getType())) {
                         pluginInstance.getManager().logToCoreProtect(player, currentBlock, true, false);
                         if (dropItems && autoPickup) {
                             if (player.getInventory().firstEmpty() == -1) {
-                                if (currentBlock.getDrops().size() > 0)
+                                if (!currentBlock.getDrops().isEmpty())
                                     for (ItemStack dropItem : currentBlock.getDrops(handItemStack)) {
                                         dropItem.setAmount(pluginInstance.getManager().getSimulatedFortuneAmount(dropItem.getType(),
                                                 dropItem.getDurability(), handItemStack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)));
@@ -1247,21 +1262,17 @@ public class FunctionUtil {
 
         boolean useGlobalCooldown = pluginInstance.getConfig().getBoolean("trench-pickaxe-section.use-global-cooldown");
         int cooldown = pluginInstance.getConfig().getInt("trench-pickaxe-section.cooldown");
-        if (useGlobalCooldown) {
-            long cooldownRemainder = pluginInstance.getManager().getGlobalCooldownRemainder(player, cooldown);
-            if (!(cooldown <= -1) && cooldownRemainder > 0) {
-                pluginInstance.getManager().sendCustomMessage(player, "on-cooldown-message", "{time-left}:" + cooldownRemainder);
-                return;
-            }
-        } else {
-            long cooldownRemainder = pluginInstance.getManager().getCooldownRemainder(player, WPType.TRENCH_PICKAXE, cooldown);
-            if (!(cooldown <= -1) && cooldownRemainder > 0) {
-                pluginInstance.getManager().sendCustomMessage(player, "on-cooldown-message", "{time-left}:" + cooldownRemainder);
-                return;
-            }
+        long cooldownRemainder;
+        if (useGlobalCooldown) cooldownRemainder = pluginInstance.getManager().getGlobalCooldownRemainder(player, cooldown);
+        else cooldownRemainder = pluginInstance.getManager().getCooldownRemainder(player, WPType.TRENCH_PICKAXE, cooldown);
+
+        if (!(cooldown <= -1) && cooldownRemainder > 0) {
+            pluginInstance.getManager().sendCustomMessage(player, "on-cooldown-message", "{time-left}:" + cooldownRemainder);
+            return;
         }
 
-        if (!pluginInstance.getManager().isInList(block.getType(), block.getData(), "trench-pickaxe-section.non-effected-materials")) {
+        if (!pluginInstance.getManager().isInList(block.getType(), block.getData(), "trench-pickaxe-section.non-effected-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))) {
             if (!pluginInstance.getManager().isLocationSafe(block.getLocation(), player, true, false, block.getType())) {
                 pluginInstance.getManager().sendCustomMessage(player, "hook-fail-message");
                 return;
@@ -1279,13 +1290,13 @@ public class FunctionUtil {
                 for (int x = ((-itemRadius) - 1); ++x <= itemRadius; )
                     for (int z = ((-itemRadius) - 1); ++z <= itemRadius; ) {
                         Block currentBlock = block.getRelative(x, y, z);
-                        if (!pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "trench-pickaxe-section.non-effected-materials")
+                        if (!pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "trench-pickaxe-section.non-effected-materials",
+                                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                                 && pluginInstance.getManager().isLocationSafe(currentBlock.getLocation(), player, true, false, currentBlock.getType())) {
                             pluginInstance.getManager().logToCoreProtect(player, currentBlock, true, false);
                             if (dropItems && autoPickup) {
-                                List<ItemStack> dropList = new ArrayList<>(currentBlock.getDrops());
                                 if (player.getInventory().firstEmpty() == -1) {
-                                    if (currentBlock.getDrops().size() > 0)
+                                    if (!currentBlock.getDrops().isEmpty())
                                         for (ItemStack dropItem : currentBlock.getDrops(handItemStack)) {
                                             dropItem.setAmount(pluginInstance.getManager().getSimulatedFortuneAmount(dropItem.getType(),
                                                     dropItem.getDurability(), handItemStack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)));
@@ -1293,7 +1304,7 @@ public class FunctionUtil {
                                         }
 
                                 } else {
-                                    if (currentBlock.getDrops().size() > 0)
+                                    if (!currentBlock.getDrops().isEmpty())
                                         for (ItemStack dropItem : currentBlock.getDrops(handItemStack)) {
                                             dropItem.setAmount(pluginInstance.getManager().getSimulatedFortuneAmount(dropItem.getType(),
                                                     dropItem.getDurability(), handItemStack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)));
@@ -1347,8 +1358,8 @@ public class FunctionUtil {
             return;
         }
 
-        if (!pluginInstance.getManager().isInList(block.getType(), block.getData(),
-                "trench-shovel-section.non-effected-materials")) {
+        if (!pluginInstance.getManager().isInList(block.getType(), block.getData(), "trench-shovel-section.non-effected-materials",
+                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))) {
             if (!pluginInstance.getManager().isLocationSafe(block.getLocation(), player, true, false, block.getType())) {
                 pluginInstance.getManager().sendCustomMessage(player, "hook-fail-message");
                 return;
@@ -1366,13 +1377,13 @@ public class FunctionUtil {
                 for (int x = ((-itemRadius) - 1); ++x <= itemRadius; )
                     for (int z = ((-itemRadius) - 1); ++z <= itemRadius; ) {
                         Block currentBlock = block.getRelative(x, y, z);
-                        if (!pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "trench-shovel-section.non-effected-materials")
+                        if (!pluginInstance.getManager().isInList(currentBlock.getType(), currentBlock.getData(), "trench-shovel-section.non-effected-materials",
+                                pluginInstance.getConfig().getBoolean("general-section.blacklist-effected-materials"), pluginInstance.getConfig().getBoolean("general-section.loose-check-effected-materials"))
                                 && pluginInstance.getManager().isLocationSafe(currentBlock.getLocation(), player, true, false, currentBlock.getType())) {
                             pluginInstance.getManager().logToCoreProtect(player, currentBlock, true, false);
                             if (dropItems && autoPickup) {
-                                List<ItemStack> dropList = new ArrayList<>(currentBlock.getDrops());
                                 if (player.getInventory().firstEmpty() == -1) {
-                                    if (currentBlock.getDrops().size() > 0)
+                                    if (!currentBlock.getDrops().isEmpty())
                                         for (ItemStack dropItem : currentBlock.getDrops(handItemStack)) {
                                             dropItem.setAmount(pluginInstance.getManager().getSimulatedFortuneAmount(dropItem.getType(),
                                                     dropItem.getDurability(), handItemStack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)));
@@ -1380,7 +1391,7 @@ public class FunctionUtil {
                                         }
 
                                 } else {
-                                    if (currentBlock.getDrops().size() > 0)
+                                    if (!currentBlock.getDrops().isEmpty())
                                         for (ItemStack dropItem : currentBlock.getDrops(handItemStack)) {
                                             dropItem.setAmount(pluginInstance.getManager().getSimulatedFortuneAmount(dropItem.getType(),
                                                     dropItem.getDurability(), handItemStack.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)));

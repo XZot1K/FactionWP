@@ -14,6 +14,10 @@ general-section:
   # If these options are enabled, items with custom display names and lore are able to be sold.
   sell-custom-lore-items: false
   sell-custom-name-items: false
+  # If enabled, all material-related lists will be blacklists. Otherwise, they will be whitelists.
+  blacklist-effected-materials: true
+  # If enabled, only a part of the material name needs to be implemented. (For example ENDER_FRAME_PORTAL, FRAME or PORTAL can be added in its place).
+  loose-check-effected-materials: false
 
 # This is where you can configure all options that effect all of the wands and pickaxes.
 global-item-section:

@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import xzot1k.plugins.fwp.FactionWP;
 import xzot1k.plugins.fwp.api.enums.WPType;
 
@@ -24,7 +25,7 @@ public class Commands implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String alias, String[] args) {
+    public boolean onCommand(@NotNull CommandSender commandSender, Command command, @NotNull String alias, String[] args) {
         if (command.getName().equalsIgnoreCase("factionwp")) {
             switch (args.length) {
                 case 1:
@@ -78,7 +79,6 @@ public class Commands implements CommandExecutor {
     }
 
     private void runInfoCommand(CommandSender commandSender) {
-
         if (!commandSender.hasPermission("factionwp.info")) {
             pluginInstance.getManager().sendCustomMessage(commandSender, "no-permission-message");
             return;
@@ -141,7 +141,7 @@ public class Commands implements CommandExecutor {
                 return;
             } else amount = Integer.parseInt(amountString);
 
-            ItemStack itemStack = pluginInstance.getManager().buildItem(wpType, amount, -1, -1, 1);
+            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, -1, -1, 1);
             if (player.getInventory().firstEmpty() == -1)
                 player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
             else
@@ -202,7 +202,7 @@ public class Commands implements CommandExecutor {
                 if (uses < -1) uses = -1;
             }
 
-            ItemStack itemStack = pluginInstance.getManager().buildItem(wpType, amount, uses, -1, 1);
+            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, uses, -1, 1);
             if (player.getInventory().firstEmpty() == -1)
                 player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
             else
@@ -275,7 +275,7 @@ public class Commands implements CommandExecutor {
                 }
             }
 
-            ItemStack itemStack = pluginInstance.getManager().buildItem(wpType, amount, uses, (int) radius, radius);
+            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, uses, (int) radius, radius);
             if (player.getInventory().firstEmpty() == -1)
                 player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
             else

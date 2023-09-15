@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xzot1k.plugins.fwp.FactionWP;
 import xzot1k.plugins.fwp.api.enums.SpawnerPickaxeMode;
 import xzot1k.plugins.fwp.api.enums.WPType;
@@ -150,7 +152,7 @@ public class Manager {
         final String prefix = pluginInstance.getLangConfig().getString("prefix");
         if (prefix != null && !message.toLowerCase().startsWith("{bar}")) message = prefix + message;
 
-        if (placeholders != null && placeholders.length > 0)
+        if (placeholders != null)
             for (String phLine : placeholders) {
                 if (!phLine.contains(":")) continue;
                 final String[] args = phLine.split(":");
@@ -230,7 +232,7 @@ public class Manager {
      * @param modifier The modifier of the tool (Some types don't use this value).
      * @return The tool's ItemStack.
      */
-    public ItemStack buildItem(WPType wpType, int amount, int uses, int radius, double modifier) {
+    public ItemStack buildItem(@Nullable Player player, @NotNull WPType wpType, int amount, int uses, int radius, double modifier) {
         String itemPath = wpType.name().toLowerCase().replace("_", "-") + "-section",
                 materialName = pluginInstance.getConfig().getString(itemPath + ".item.material");
 
@@ -293,7 +295,8 @@ public class Manager {
                 name = name + statsFormat;
             }
 
-            if (name != null) itemMeta.setDisplayName(colorText(name));
+            if (name != null) itemMeta.setDisplayName(colorText((FactionWP.getPluginInstance().isPlaceholderAPIInstalled() && player != null)
+                    ? me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, name) : name));
             itemMeta.setLore(new ArrayList<String>() {
                 private static final long serialVersionUID = 1L;
 
@@ -332,7 +335,8 @@ public class Manager {
                             }
                         }
 
-                        add(colorText(line));
+                        add(colorText((FactionWP.getPluginInstance().isPlaceholderAPIInstalled() && player != null)
+                                ? me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, line) : line));
                     }
                 }
             });
@@ -898,8 +902,8 @@ public class Manager {
                 com.massivecraft.factions.FLocation fLocation = new com.massivecraft.factions.FLocation(location);
                 com.massivecraft.factions.Faction factionAtLocation = com.massivecraft.factions.Board.getInstance().getFactionAt(fLocation);
                 com.massivecraft.factions.FPlayer fPlayer = com.massivecraft.factions.FPlayers.getInstance().getByPlayer(player);
-                if (!factionAtLocation.isWilderness()
-                        && !fPlayer.getFaction().getComparisonTag().equalsIgnoreCase(factionAtLocation.getComparisonTag())) return false;
+                return (factionAtLocation.isWilderness()
+                        || fPlayer.getFaction().getComparisonTag().equalsIgnoreCase(factionAtLocation.getComparisonTag()));
             } else {
 
                 try {
@@ -913,8 +917,8 @@ public class Manager {
                 com.massivecraft.factions.entity.Faction factionAtLocation = com.massivecraft.factions.entity.BoardColl.get()
                         .getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(location));
                 com.massivecraft.factions.entity.MPlayer mPlayer = com.massivecraft.factions.entity.MPlayer.get(player);
-                if (!factionAtLocation.getId().equalsIgnoreCase(com.massivecraft.factions.entity.FactionColl.get().getNone().getId())
-                        && !factionAtLocation.getId().equalsIgnoreCase(mPlayer.getFaction().getId())) return false;
+                return (factionAtLocation.getId().equalsIgnoreCase(com.massivecraft.factions.entity.FactionColl.get().getNone().getId())
+                        || factionAtLocation.getId().equalsIgnoreCase(mPlayer.getFaction().getId()));
             }
 
         return true;
@@ -1338,30 +1342,31 @@ public class Manager {
                 nextMode = SpawnerPickaxeMode.NATURAL;
         }
 
-        if(currentMode == nextMode) return;
+        if (currentMode == nextMode) return;
         getSpawnerPickaxeModeMap().put(player.getUniqueId(), nextMode);
         sendCustomMessage(player, "spawner-pickaxe-cycle-message",
                 ("{mode}:" + pluginInstance.getConfig().getString("spawner-pickaxe-section.modes." + nextMode.name().toLowerCase())));
     }
 
-    public boolean isInList(Material material, int durability, String configurationPath) {
+    public boolean isInList(Material material, int durability, String configurationPath, boolean blacklist, boolean looseCheck) {
         List<String> otherMaterials = pluginInstance.getConfig().getStringList(configurationPath);
         for (int i = -1; ++i < otherMaterials.size(); ) {
             String materialLine = otherMaterials.get(i);
-            try {
-                if (materialLine.contains(":")) {
-                    String[] materialLineArgs = materialLine.split(":");
-                    int lineDurability = Integer.parseInt(materialLineArgs[1]);
-                    if (Material.getMaterial(materialLineArgs[0].replace("-", "_").replace(" ", "_")) == material
-                            && (lineDurability == -1 || durability == Integer.parseInt(materialLineArgs[1]))) return true;
-                } else {
-                    if (Material.getMaterial(materialLine.replace("-", "_").replace(" ", "_")) == material && durability == 0)
-                        return true;
-                }
-            } catch (Exception ignored) {}
-        }
 
-        return false;
+            if (materialLine.contains(":")) {
+                String[] materialLineArgs = materialLine.split(":");
+                String formattedMat = materialLineArgs[0].toUpperCase().replace("-", "_").replace(" ", "_");
+                int lineDurability = Integer.parseInt(materialLineArgs[1]);
+
+                if ((looseCheck ? material.name().contains(formattedMat) : material.name().equals(formattedMat))
+                        && (lineDurability == -1 || durability == Integer.parseInt(materialLineArgs[1]))) return blacklist;
+            }
+
+            String formattedMat = materialLine.toUpperCase().replace("-", "_").replace(" ", "_");
+            if (looseCheck ? material.name().contains(formattedMat) : material.name().equals(formattedMat))
+                return blacklist;
+        }
+        return !blacklist;
     }
 
     public double getMaterialPrice(ItemStack itemStack, String configurationPath) {

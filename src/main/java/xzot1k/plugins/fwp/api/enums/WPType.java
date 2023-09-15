@@ -4,6 +4,11 @@
 
 package xzot1k.plugins.fwp.api.enums;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum WPType {
     SAND_WAND(true, false, false, false, false), CRAFT_WAND(true, false, false, false, false),
     SELL_WAND(true, false, true, false, true), LIGHTNING_WAND(true, false, false, false, false),
@@ -16,6 +21,20 @@ public enum WPType {
     SPAWNER_PICKAXE(true, false, false, true, false);
 
     private final boolean uses, radius, modifier, blockCount, sellCount;
+
+    WPType(boolean uses, boolean radius, boolean modifier, boolean blockCount, boolean sellCount) {
+        this.uses = uses;
+        this.radius = radius;
+        this.modifier = modifier;
+        this.blockCount = blockCount;
+        this.sellCount = sellCount;
+    }
+
+    public static WPType getType(@NotNull String type) {
+        String typeFormatted = type.toUpperCase().replace(" ", "_").replace("-", "_");
+        Optional<WPType> wpTypeOptional = Arrays.stream(values()).parallel().filter(wpType -> typeFormatted.equals(wpType.name())).findFirst();
+        return wpTypeOptional.orElse(null);
+    }
 
     public boolean hasUses() {
         return uses;
@@ -35,13 +54,5 @@ public enum WPType {
 
     public boolean hasSellCount() {
         return sellCount;
-    }
-
-    WPType(boolean uses, boolean radius, boolean modifier, boolean blockCount, boolean sellCount) {
-        this.uses = uses;
-        this.radius = radius;
-        this.modifier = modifier;
-        this.blockCount = blockCount;
-        this.sellCount = sellCount;
     }
 }

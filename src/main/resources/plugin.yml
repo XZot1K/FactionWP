@@ -6,7 +6,8 @@ author: XZot1K
 description: Brings a large variety of wands & pickaxes to your server that each have their own unique abilities!
 loadbefore: [ ShopGUIPlus ]
 softdepend: [ Vault, WorldGuard, WorldEdit, Essentials, EssentialsX, Factions, FactionsX, MassiveCore, SuperiorSkyblock2, ASkyBlock,
-              SkyBlock, FabledSkyBlock, GriefPrevention, ShopGUIPlus, CoreProtect, SpartanAPI, mcMMO, WildChests, SilkSpawners, CommandPanels ]
+              SkyBlock, FabledSkyBlock, GriefPrevention, ShopGUIPlus, CoreProtect, SpartanAPI, mcMMO, WildChests, SilkSpawners, CommandPanels,
+              PlaceholderAPI ]
 commands:
   factionwp:
     default: op
