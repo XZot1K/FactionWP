@@ -67,6 +67,8 @@ global-item-section:
   # Any of the mode switching features will use these values as the toggle value.
   enable-placeholder: "Enabled"
   disabled-placeholder: "Disabled"
+  # This value is used when the uses parameter in commands is not provided (set to -1 for unlimited).
+  predefined-uses: 1000
 
 # Here is where you can configure specific interactions with other plugins.
 hooks-section:

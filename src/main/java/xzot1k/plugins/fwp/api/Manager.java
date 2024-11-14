@@ -5,24 +5,26 @@
 package xzot1k.plugins.fwp.api;
 
 import com.massivecraft.factions.listeners.FactionsBlockListener;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.ryanhamshire.GriefPrevention.ClaimPermission;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xzot1k.plugins.fwp.FactionWP;
 import xzot1k.plugins.fwp.api.enums.SpawnerPickaxeMode;
 import xzot1k.plugins.fwp.api.enums.WPType;
+import xzot1k.plugins.fwp.api.objects.WPData;
 import xzot1k.plugins.fwp.core.objects.versions.ABH_Latest;
 import xzot1k.plugins.fwp.core.objects.versions.ABH_Old;
 import xzot1k.plugins.fwp.core.packets.actionbar.BarHandler;
@@ -232,7 +234,7 @@ public class Manager {
      * @param modifier The modifier of the tool (Some types don't use this value).
      * @return The tool's ItemStack.
      */
-    public ItemStack buildItem(@Nullable Player player, @NotNull WPType wpType, int amount, int uses, int radius, double modifier) {
+    public ItemStack buildItem(@NotNull Player player, @NotNull WPType wpType, int amount, int uses, int radius, double modifier) {
         String itemPath = wpType.name().toLowerCase().replace("_", "-") + "-section",
                 materialName = pluginInstance.getConfig().getString(itemPath + ".item.material");
 
@@ -256,94 +258,7 @@ public class Manager {
                 itemStack.addUnsafeEnchantment(enchant, Integer.parseInt(enchantmentStringArgs[1]));
         }
 
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        if (itemMeta != null) {
-            final String usesFormat = pluginInstance.getConfig().getString("global-item-section.uses-format"),
-                    radiusFormat = pluginInstance.getConfig().getString("global-item-section.radius-format"),
-                    sellFormat = pluginInstance.getConfig().getString("global-item-section.sell-format"),
-                    modifierFormat = pluginInstance.getConfig().getString("global-item-section.modifier-format"),
-                    blockFormat = pluginInstance.getConfig().getString("global-item-section.block-count-format");
-            final boolean areaMode = pluginInstance.getConfig().getBoolean("global-item-section.radius-area-mode"),
-                    sellMode = pluginInstance.getConfig().getBoolean("global-item-section.display-sell-count"),
-                    blockMode = pluginInstance.getConfig().getBoolean("global-item-section.display-block-count");
-            final int rad = ((radius * 2) + 1);
-
-            if (pluginInstance.getConfig().getBoolean("global-item-section.hide-enchantments"))
-                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-            String name = pluginInstance.getConfig().getString(itemPath + ".item.display-name");
-
-            final boolean nameStats = pluginInstance.getConfig().getBoolean("global-item-section.name-use-radius");
-            if (nameStats && name != null) {
-                String statsFormat = pluginInstance.getConfig().getString("global-item-section.name-use-radius-format");
-                if (wpType.hasUses() && statsFormat != null)
-                    statsFormat = statsFormat.replace("{uses}", String.valueOf(uses));
-
-                if (wpType.hasRadius() && statsFormat != null)
-                    statsFormat = statsFormat.replace("{radius}", !areaMode ? String.valueOf(radius)
-                            : (rad + "x" + rad + "x" + rad));
-
-                if (wpType.hasSellCount() && sellMode && statsFormat != null)
-                    statsFormat = statsFormat.replace("{sell-count}", String.valueOf(0));
-
-                if (wpType.hasBlockCount() && blockMode && statsFormat != null)
-                    statsFormat = statsFormat.replace("{block-count}", String.valueOf(0));
-
-                if (wpType.hasModifier() && statsFormat != null)
-                    statsFormat = statsFormat.replace("{modifier}", String.valueOf(modifier));
-
-                name = name + statsFormat;
-            }
-
-            if (name != null) itemMeta.setDisplayName(colorText((FactionWP.getPluginInstance().isPlaceholderAPIInstalled() && player != null)
-                    ? me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, name) : name));
-            itemMeta.setLore(new ArrayList<String>() {
-                private static final long serialVersionUID = 1L;
-
-                {
-                    List<String> lore = pluginInstance.getConfig().getStringList(itemPath + ".item.lore");
-                    ConfigurationSection toolSection = pluginInstance.getConfig().getConfigurationSection(itemPath);
-
-                    for (int i = -1; ++i < lore.size(); ) {
-                        String line = lore.get(i);
-                        if (toolSection != null) {
-                            switch (line.toLowerCase()) {
-                                case "{uses-line}":
-                                    if (usesFormat != null && wpType.hasUses() && uses != -1)
-                                        add(colorText(usesFormat.replace("{uses}", String.valueOf(uses))));
-                                    continue;
-                                case "{sell-line}":
-                                    if (sellFormat != null && wpType.hasSellCount() && sellMode)
-                                        add(colorText(sellFormat.replace("{count}", String.valueOf(0))));
-                                    continue;
-                                case "{modifier-line}":
-                                    if (modifierFormat != null && wpType.hasModifier())
-                                        add(colorText(modifierFormat.replace("{modifier}", String.valueOf(modifier))));
-                                    continue;
-                                case "{radius-line}":
-                                    if (radiusFormat != null && wpType.hasRadius()) {
-                                        add(colorText(radiusFormat.replace("{radius}", !areaMode ? String.valueOf(radius)
-                                                : (rad + "x" + rad + "x" + rad))));
-                                    }
-                                    continue;
-                                case "{block-line}":
-                                    if (blockFormat != null && wpType.hasBlockCount() && blockMode)
-                                        add(colorText(blockFormat.replace("{count}", String.valueOf(0))));
-                                    continue;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        add(colorText((FactionWP.getPluginInstance().isPlaceholderAPIInstalled() && player != null)
-                                ? me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, line) : line));
-                    }
-                }
-            });
-            itemStack.setItemMeta(itemMeta);
-        }
-
-        return itemStack;
+        return new WPData(itemStack, wpType, uses, radius, modifier, 0, 0).apply(player, itemStack);
     }
 
     /**
@@ -409,313 +324,6 @@ public class Manager {
         return 0;
     }
 
-    /**
-     * Gets how many uses a particular item has left in the lore.
-     *
-     * @param itemStack the itemstack to check.
-     * @return the amount of uses remaining.
-     */
-    public int getItemUses(ItemStack itemStack) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-
-            final String usesFormat = pluginInstance.getConfig().getString("global-item-section.uses-format");
-            if (usesFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your uses format in the configuration is invalid!");
-                return -1;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(usesFormat)).replace("{uses}", "%uses%");
-            String[] usesFormatArgs = formattedFormat.split("%uses%");
-            List<String> lore = itemMeta.getLore();
-            for (int i = -1; ++i < lore.size(); ) {
-                final String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-                if (usesFormatArgs.length >= 2) {
-                    if (!formattedLine.startsWith(usesFormatArgs[0]) || !formattedLine.endsWith(usesFormatArgs[1]))
-                        continue;
-                    return Integer.parseInt(formattedLine.replace(usesFormatArgs[0], "").replace(usesFormatArgs[1], ""));
-                } else if (usesFormatArgs.length >= 1) {
-                    if (!formattedLine.startsWith(usesFormatArgs[0]))
-                        continue;
-                    return Integer.parseInt(formattedLine.replace(usesFormatArgs[0], ""));
-                } else if (!pluginInstance.getManager().isNotNumeric(formattedLine))
-                    return Integer.parseInt(formattedLine);
-            }
-
-            return -1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Removes an amount of uses from an item's total uses.
-     *
-     * @param player    the player to remove from.
-     * @param itemStack the item to remove the uses from.
-     * @param uses      the amount of uses.
-     */
-    public void removeItemUses(Player player, ItemStack itemStack, int uses) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            final int gatheredUses = getItemUses(itemStack);
-            ItemStack itemDuplicate = itemStack.clone();
-
-            final String usesFormat = pluginInstance.getConfig().getString("global-item-section.uses-format");
-            if (usesFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your uses format in the configuration is invalid!");
-                return;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(usesFormat)).replace("{uses}", "%uses%");
-            String[] usesFormatArgs = formattedFormat.split("%uses%");
-            List<String> lore = itemMeta.getLore();
-            for (int i = -1; ++i < lore.size(); ) {
-                String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-                if (usesFormatArgs.length >= 2) {
-                    if (!formattedLine.startsWith(usesFormatArgs[0]) || !formattedLine.endsWith(usesFormatArgs[1]))
-                        continue;
-                } else if (usesFormatArgs.length >= 1) {
-                    if (!formattedLine.startsWith(usesFormatArgs[0]))
-                        continue;
-                } else if (!pluginInstance.getManager().isNotNumeric(formattedLine))
-                    Integer.parseInt(formattedLine);
-
-                final String replace = usesFormat.replace("{uses}", String.valueOf(gatheredUses - uses));
-                if (gatheredUses == -1) lore.remove(i);
-
-                lore.set(i, colorText(replace));
-                itemMeta.setLore(lore);
-                itemStack.setItemMeta(itemMeta);
-
-                if (itemStack.getAmount() > 1) {
-                    itemStack.setAmount(1);
-                    if (player.getInventory().firstEmpty() == -1) {
-                        itemDuplicate.setAmount(itemDuplicate.getAmount() - 1);
-                        player.getWorld().dropItemNaturally(player.getLocation(), itemDuplicate);
-                    } else {
-                        itemDuplicate.setAmount(itemDuplicate.getAmount() - 1);
-                        player.getInventory().addItem(itemDuplicate);
-                    }
-                }
-
-                player.updateInventory();
-                if (gatheredUses != -1 && (Math.max(0, gatheredUses) - Math.max(0, uses)) <= 0) {
-                    removeItem(player.getInventory(), itemStack);
-                    player.playSound(player.getLocation(), (!pluginInstance.getServerVersion().startsWith("v1_7")
-                            && !pluginInstance.getServerVersion().startsWith("v1_8")) ? Sound.ENTITY_ITEM_BREAK
-                            : Sound.valueOf("ITEM_BREAK"), 1, 1);
-                }
-            }
-        }
-    }
-
-    /**
-     * Adds an amount of uses to an item's total uses.
-     *
-     * @param itemStack the item to add the uses to.
-     * @param uses      the amount of uses.
-     */
-    public void addItemUses(ItemStack itemStack, int uses) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            final int gatheredUses = getItemUses(itemStack);
-
-            final String usesFormat = pluginInstance.getConfig().getString("global-item-section.uses-format");
-            if (usesFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your uses format in the configuration is invalid!");
-                return;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(usesFormat)).replace("{uses}", "%uses%");
-            String[] usesFormatArgs = formattedFormat.split("%uses%");
-            List<String> lore = itemMeta.getLore();
-            for (int i = -1; ++i < lore.size(); ) {
-                final String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-                if (usesFormatArgs.length >= 2 && !formattedLine.startsWith(usesFormatArgs[0])
-                        || !formattedLine.endsWith(usesFormatArgs[1])) continue;
-                else if (!formattedLine.startsWith(usesFormatArgs[0])) continue;
-
-                final String replace = usesFormat.replace("{uses}", String.valueOf(gatheredUses + uses));
-
-                if (gatheredUses == -1) lore.remove(i);
-                lore.set(i, colorText(replace));
-            }
-
-            itemMeta.setLore(lore);
-            itemStack.setItemMeta(itemMeta);
-        }
-    }
-
-    /**
-     * Gets the amount of blocks broken from an item.
-     *
-     * @param itemStack the item to get block break count from.
-     * @return the amount of blocks broken with this item.
-     */
-    public int getBlocksBroken(ItemStack itemStack) {
-        if (itemStack.getItemMeta() != null && itemStack.hasItemMeta() && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            List<String> lore = itemMeta.getLore();
-            final String blockCountFormat = pluginInstance.getConfig().getString("global-item-section.block-count-format");
-
-            if (blockCountFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your block count format in the configuration is invalid!");
-                return 0;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(blockCountFormat)).replace("{count}", "%count%");
-            String[] usesFormatArgs = formattedFormat.split("%count%");
-            for (int i = -1; ++i < lore.size(); ) {
-                String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-                try {
-                    if (usesFormatArgs.length >= 2)
-                        return Integer.parseInt(
-                                formattedLine.replace(usesFormatArgs[0], "").replace(usesFormatArgs[1], ""));
-                    else if (usesFormatArgs.length >= 1)
-                        return Integer.parseInt(formattedLine.replace(usesFormatArgs[0], ""));
-                    else {
-                        try {
-                            return Integer.parseInt(formattedLine);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Adds to the amount of blocks broken on an item.
-     *
-     * @param player     the player to add to.
-     * @param itemStack  the item to add the amount of blocks broken count.
-     * @param blockCount the amount of broken blocks to add.
-     */
-    public void addToBlocksBroken(Player player, ItemStack itemStack, int blockCount) {
-        if (!pluginInstance.getConfig().getBoolean("global-item-section.display-block-count"))
-            return;
-
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            List<String> lore = itemMeta.getLore();
-            final String blockCountFormat = pluginInstance.getConfig().getString("global-item-section.block-count-format");
-
-            if (blockCountFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your block count format in the configuration is invalid!");
-                return;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(blockCountFormat)).replace("{count}", "%count%");
-            int brokenCount = getBlocksBroken(itemStack);
-            counterHelper(player, itemStack, blockCount, itemMeta, lore, blockCountFormat, formattedFormat, brokenCount);
-        }
-    }
-
-    /**
-     * Gets the amount of items sold with an item.
-     *
-     * @param itemStack the item to get the amount of items sold.
-     * @return the amount of items sold.
-     */
-    public int getItemsSold(ItemStack itemStack) {
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            List<String> lore = itemMeta.getLore();
-            final String sellFormat = pluginInstance.getConfig().getString("global-item-section.sell-format");
-
-            if (sellFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your sell format in the configuration is invalid!");
-                return 0;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(sellFormat)).replace("{count}", "%count%");
-            String[] formatArgs = formattedFormat.split("%count%");
-            for (int i = -1; ++i < lore.size(); ) {
-                String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-                try {
-                    if (formatArgs.length >= 2)
-                        return Integer.parseInt(formattedLine.replace(formatArgs[0], "").replace(formatArgs[1], ""));
-                    else if (formatArgs.length >= 1) return Integer.parseInt(formattedLine.replace(formatArgs[0], ""));
-                    else return Integer.parseInt(formattedLine);
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Adds to the amount of items sold to an item.
-     *
-     * @param player    the player to add too.
-     * @param itemStack the item to get the amount from.
-     * @param sellCount the amount of items sold to add.
-     */
-    public void addToItemsSold(Player player, ItemStack itemStack, int sellCount) {
-        if (!pluginInstance.getConfig().getBoolean("global-item-section.display-sell-count"))
-            return;
-
-        if (itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            List<String> lore = itemMeta.getLore();
-            final String sellFormat = pluginInstance.getConfig().getString("global-item-section.sell-format");
-
-            if (sellFormat == null) {
-                pluginInstance.log(Level.WARNING, "Your sell format in the configuration is invalid!");
-                return;
-            }
-
-            final String formattedFormat = ChatColor.stripColor(colorText(sellFormat)).replace("{count}", "%count%");
-            int sellCounted = getItemsSold(itemStack);
-            counterHelper(player, itemStack, sellCount, itemMeta, lore, sellFormat, formattedFormat, sellCounted);
-        }
-    }
-
-    private void counterHelper(Player player, ItemStack itemStack, int sellCount, ItemMeta itemMeta,
-                               List<String> lore, String sellFormat, String formattedFormat, int sellCounted) {
-        ItemStack itemDuplicate = itemStack.clone();
-        String[] usesFormatArgs = formattedFormat.split("%count%");
-        for (int i = -1; ++i < lore.size(); ) {
-            String line = lore.get(i), formattedLine = ChatColor.stripColor(line);
-            if (usesFormatArgs.length >= 2) {
-                if (!formattedLine.startsWith(usesFormatArgs[0]) || !formattedLine.endsWith(usesFormatArgs[1]))
-                    continue;
-            } else if (usesFormatArgs.length >= 1) {
-                if (!formattedLine.startsWith(usesFormatArgs[0]))
-                    continue;
-            } else {
-                try {
-                    Integer.parseInt(formattedLine);
-                } catch (Exception ignored) {
-                    continue;
-                }
-            }
-
-            lore.set(i, colorText(sellFormat.replace("{count}", String.valueOf(sellCounted + sellCount))));
-            itemMeta.setLore(lore);
-            itemStack.setItemMeta(itemMeta);
-            player.updateInventory();
-
-            if (itemStack.getAmount() > 1) {
-                itemStack.setAmount(1);
-                if (player.getInventory().firstEmpty() == -1) {
-                    itemDuplicate.setAmount(itemDuplicate.getAmount() - 1);
-                    player.getWorld().dropItemNaturally(player.getLocation(), itemDuplicate);
-                } else {
-                    itemDuplicate.setAmount(itemDuplicate.getAmount() - 1);
-                    player.getInventory().addItem(itemDuplicate);
-                }
-            }
-
-            break;
-        }
-    }
-
     private boolean isSimilar(ItemStack itemOne, ItemStack itemTwo) {
         ItemStack newItem = itemOne.clone();
         newItem.setAmount(itemTwo.getAmount());
@@ -723,17 +331,22 @@ public class Manager {
     }
 
     /**
-     * Removes an item from an inventory.
+     * Remove a certain amount of a certain similar item.
      *
-     * @param inventory the inventory to remove from.
-     * @param itemStack the item to remove (not including item amount).
+     * @param inventory The inventory to remove from.
+     * @param itemStack The item to check for.
+     * @param amount    The amount to remove.
+     * @return Whether an item was removed or not.
      */
-    private void removeItem(Inventory inventory, ItemStack itemStack) {
-        int left = 1;
+    public boolean removeItem(@NotNull Inventory inventory, @NotNull ItemStack itemStack, int amount) {
+        int left = amount;
+        boolean removedItems = false;
 
         for (int i = -1; ++i < inventory.getSize(); ) {
             ItemStack is = inventory.getItem(i);
-            if (is != null && isSimilar(is, itemStack)) {
+            if (is == null) continue;
+
+            if (isSimilar(is, itemStack)) {
                 if (left >= is.getAmount()) {
                     inventory.clear(i);
                     left -= is.getAmount();
@@ -742,11 +355,14 @@ public class Manager {
                     is.setAmount(is.getAmount() - left);
                     left = 0;
                 }
+
+                removedItems = true;
             }
         }
 
-        if (inventory.getHolder() instanceof Player)
-            ((Player) inventory.getHolder()).updateInventory();
+        if (inventory.getHolder() instanceof Player) ((Player) inventory.getHolder()).updateInventory();
+
+        return removedItems;
     }
 
     /**
@@ -822,7 +438,7 @@ public class Manager {
         double x = location.getX() - center.getX(), z = location.getZ() - center.getZ();
         if (((x > size || (-x) > size) || (z > size || (-z) > size))) return false;
 
-        if (getWPItemType(getHandItem(player)) != WPType.SPAWNER_PICKAXE) {
+        if (getWPItemType(player, getHandItem(player)) != WPType.SPAWNER_PICKAXE) {
             List<String> materialList = pluginInstance.getConfig().getStringList("hooks-section.blocked-materials");
             for (int i = -1; ++i < materialList.size(); ) {
                 String materialName = materialList.get(i);
@@ -1085,11 +701,8 @@ public class Manager {
      * @param itemStack the item to check.
      * @return whether it is a FactionWP tool or not.
      */
-    public boolean isWPItem(ItemStack itemStack) {
-        for (int i = -1; ++i < WPType.values().length; )
-            if (doesWPTypeMatchItem(WPType.values()[i], itemStack))
-                return true;
-        return false;
+    public boolean isWPItem(@NotNull ItemStack itemStack) {
+        return Arrays.stream(WPType.values()).parallel().anyMatch(wpType -> doesWPTypeMatchItem(wpType, itemStack));
     }
 
     /**
@@ -1099,8 +712,12 @@ public class Manager {
      * @param itemStack the itemstack to check.
      * @return whether it is or not.
      */
-    public boolean doesWPTypeMatchItem(WPType wpType, ItemStack itemStack) {
-        if (itemStack != null && (itemStack.getItemMeta() != null && itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().hasLore())) {
+    public boolean doesWPTypeMatchItem(@NotNull WPType wpType, @NotNull ItemStack itemStack) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+
+        final String wpTypeName = nbtItem.getString("fwp-type");
+        if (wpTypeName != null) return wpTypeName.toUpperCase().replace(" ", "_").replace("-", "_").equals(wpType.name());
+        else if (itemStack.getItemMeta() != null && itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().hasLore()) {
             final String path = (wpType.name().toLowerCase().replace("_", "-") + "-section.item."),
                     displayName = pluginInstance.getManager().colorText(pluginInstance.getConfig().getString(path + "display-name"));
             final Material material = Material.getMaterial(Objects.requireNonNull(pluginInstance.getConfig().getString(path + "material"))
@@ -1108,7 +725,8 @@ public class Manager {
             int durability = pluginInstance.getConfig().getInt(path + "durability");
 
             return (wpType == WPType.MULTI_TOOL || itemStack.getType() == material && (itemStack.getDurability() == durability || durability == -1))
-                    && (displayName.startsWith(itemStack.getItemMeta().getDisplayName()) || displayName.contains(itemStack.getItemMeta().getDisplayName()) || displayName.equals(itemStack.getItemMeta().getDisplayName()))
+                    && (displayName.startsWith(itemStack.getItemMeta().getDisplayName()) || displayName.contains(itemStack.getItemMeta().getDisplayName())
+                    || displayName.equals(itemStack.getItemMeta().getDisplayName()))
                     && enchantmentsMatch(itemStack, pluginInstance.getConfig().getStringList("sand-wand-section.item.enchantments"));
         }
 
@@ -1118,26 +736,33 @@ public class Manager {
     /**
      * Gets the FactionWP tool type from an item.
      *
+     * @param player    the player holding the item or associated to it.
      * @param itemStack the item to get from.
      * @return the tool type.
      */
-    public WPType getWPItemType(ItemStack itemStack) {
-        if (itemStack != null && (itemStack.getItemMeta() != null && itemStack.hasItemMeta()
-                && itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().hasLore())) {
+    public WPType getWPItemType(@NotNull Player player, @NotNull ItemStack itemStack) {
+        if (itemStack.getType().name().contains("AIR")) return null;
+
+        final WPData wpData = new WPData(player, itemStack);
+        if (wpData.getWpTypeName() != null && !wpData.getWpTypeName().isEmpty()) return WPType.getType(wpData.getWpTypeName());
+        /*else if (itemStack.getItemMeta() != null && itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().hasLore()) {
             for (WPType wpType : WPType.values()) {
                 String typeIdString = wpType.name().toLowerCase().replace("_", "-");
 
                 String displayName = pluginInstance.getManager().colorText(pluginInstance.getConfig().getString(typeIdString + "-section.item.display-name"));
-                Material material = Material.getMaterial(Objects.requireNonNull(pluginInstance.getConfig().getString(typeIdString + "-section.item.material")).toUpperCase()
-                        .replace(" ", "_").replace("-", "_"));
+                Material material = Material.getMaterial(Objects.requireNonNull(pluginInstance.getConfig().getString(typeIdString + "-section.item.material"))
+                        .toUpperCase().replace(" ", "_").replace("-", "_"));
                 int durability = pluginInstance.getConfig().getInt(typeIdString + "-section.item.durability");
 
                 if (((wpType == WPType.MULTI_TOOL || itemStack.getType() == material) && (itemStack.getDurability() == durability || durability == -1))
-                        && (displayName.startsWith(itemStack.getItemMeta().getDisplayName()) || displayName.contains(itemStack.getItemMeta().getDisplayName()) || displayName.equals(itemStack.getItemMeta().getDisplayName()))
-                        && enchantmentsMatch(itemStack, pluginInstance.getConfig().getStringList(typeIdString + "-section.item.enchantments")))
+                        && (displayName.startsWith(itemStack.getItemMeta().getDisplayName()) || displayName.contains(itemStack.getItemMeta().getDisplayName())
+                        || displayName.equals(itemStack.getItemMeta().getDisplayName()))
+                        && enchantmentsMatch(itemStack, pluginInstance.getConfig().getStringList(typeIdString + "-section.item.enchantments"))) {
+                    nbtItem.setString("fwp-type", wpType.name());
                     return wpType;
+                }
             }
-        }
+        }*/
 
         return null;
     }
@@ -1224,7 +849,7 @@ public class Manager {
      * @param enchantmentList the list of enchants (normally from configurations).
      * @return whether the item has all of the or not (check includes levels).
      */
-    private boolean enchantmentsMatch(ItemStack itemStack, List<String> enchantmentList) {
+    public boolean enchantmentsMatch(ItemStack itemStack, List<String> enchantmentList) {
         if (enchantmentList.isEmpty() && itemStack.getEnchantments().isEmpty())
             return true;
 

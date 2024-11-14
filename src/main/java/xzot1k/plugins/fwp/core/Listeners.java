@@ -4,6 +4,7 @@
 
 package xzot1k.plugins.fwp.core;
 
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Creeper;
@@ -28,6 +29,7 @@ import xzot1k.plugins.fwp.FactionWP;
 import xzot1k.plugins.fwp.api.enums.WPType;
 import xzot1k.plugins.fwp.api.events.MultiToolSwapEvent;
 import xzot1k.plugins.fwp.api.events.ToolUseEvent;
+import xzot1k.plugins.fwp.api.objects.WPData;
 import xzot1k.plugins.fwp.core.utils.FunctionUtil;
 
 import java.lang.reflect.Field;
@@ -53,7 +55,7 @@ public class Listeners implements Listener {
                 ItemStack itemStack = pluginInstance.getManager().getHandItem(e.getPlayer());
                 if (itemStack == null) return;
 
-                final WPType wpType = pluginInstance.getManager().getWPItemType(itemStack);
+                final WPType wpType = pluginInstance.getManager().getWPItemType(e.getPlayer(), itemStack);
                 if (wpType != WPType.LIGHTNING_WAND) return;
 
                 checkSpartan(e.getPlayer());
@@ -68,7 +70,7 @@ public class Listeners implements Listener {
     public void onInteract(PlayerInteractEvent e) {
 
         if (e.getAction() == Action.LEFT_CLICK_BLOCK && e.getItem() != null && e.getClickedBlock() != null) {
-            final WPType wpType = pluginInstance.getManager().getWPItemType(e.getItem());
+            final WPType wpType = pluginInstance.getManager().getWPItemType(e.getPlayer(), e.getItem());
             if (wpType != WPType.MULTI_TOOL) return;
 
             final Material newMaterial = pluginInstance.getManager().getMultiToolSwapMaterial(e.getItem(), e.getClickedBlock());
@@ -81,14 +83,16 @@ public class Listeners implements Listener {
             pluginInstance.getServer().getPluginManager().callEvent(swapEvent);
             if (!swapEvent.isCancelled()) {
                 e.getItem().setType(newMaterial);
-                e.getPlayer().updateInventory();
 
-                if (!pluginInstance.getConfig().getBoolean("multi-tool-section.alternative-durability-usage"))
-                    pluginInstance.getManager().removeItemUses(e.getPlayer(), e.getItem(), 1);
+                if (!pluginInstance.getConfig().getBoolean("multi-tool-section.alternative-durability-usage")) {
+                    WPData wpData = new WPData(e.getPlayer(), e.getItem());
+                    wpData.removeUses(e.getPlayer(), e.getItem(), 1);
+                    wpData.apply(e.getPlayer(), e.getItem());
+                }
             }
 
         } else if ((e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) && e.getItem() != null) {
-            final WPType wpType = pluginInstance.getManager().getWPItemType(e.getItem());
+            final WPType wpType = pluginInstance.getManager().getWPItemType(e.getPlayer(), e.getItem());
             if (wpType == null) return;
 
             checkSpartan(e.getPlayer());
@@ -251,19 +255,20 @@ public class Listeners implements Listener {
         if (e.getDamager() instanceof Player) {
             Player damager = (Player) e.getDamager();
             final ItemStack handItem = pluginInstance.getManager().getHandItem(damager);
-            final WPType wpType = pluginInstance.getManager().getWPItemType(handItem);
+            final WPType wpType = pluginInstance.getManager().getWPItemType(damager, handItem);
             if (wpType == WPType.MULTI_TOOL) {
                 checkSpartan(damager);
-                pluginInstance.getManager().removeItemUses(damager, handItem, 1);
+
+                WPData wpData = new WPData(damager, handItem);
+                wpData.removeUses(damager, handItem, 1);
+                wpData.apply(damager, handItem);
+
                 final Material newMaterial = Material.getMaterial(handItem.getType().name().split("_")[0] + "_SWORD");
                 if (newMaterial != null) {
                     MultiToolSwapEvent swapEvent = new MultiToolSwapEvent(damager, e.getEntity().getLocation(),
                             pluginInstance.getManager().getHandItem(damager));
                     pluginInstance.getServer().getPluginManager().callEvent(swapEvent);
-                    if (!swapEvent.isCancelled()) {
-                        handItem.setType(newMaterial);
-                        damager.updateInventory();
-                    }
+                    if (!swapEvent.isCancelled()) handItem.setType(newMaterial);
                 }
             }
         }
@@ -303,85 +308,72 @@ public class Listeners implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void durabilityChange(PlayerItemDamageEvent e) {
-        final WPType wpType = pluginInstance.getManager().getWPItemType(e.getItem());
+        final WPType wpType = pluginInstance.getManager().getWPItemType(e.getPlayer(), e.getItem());
         if (wpType == null) return;
 
         e.setCancelled(true);
         e.getItem().setDurability((short) 0);
     }
 
-   /* @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlace(BlockPlaceEvent e) {
-        if(FactionWP.getPluginInstance().getSilkSpawnersHandler() == null) {
-
-        }
-    }*/
-
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         ItemStack handItemStack = pluginInstance.getManager().getHandItem(e.getPlayer());
         if (handItemStack == null) return;
 
-        final WPType wpType = pluginInstance.getManager().getWPItemType(handItemStack);
+        final WPType wpType = pluginInstance.getManager().getWPItemType(e.getPlayer(), handItemStack);
         if (wpType == null) return;
         else if (wpType == WPType.MULTI_TOOL) {
-            if (pluginInstance.getConfig().getBoolean("multi-tool-section.alternative-durability-usage"))
-                pluginInstance.getManager().removeItemUses(e.getPlayer(), pluginInstance.getManager().getHandItem(e.getPlayer()), 1);
+            if (pluginInstance.getConfig().getBoolean("multi-tool-section.alternative-durability-usage")) {
+                final ItemStack handItem = pluginInstance.getManager().getHandItem(e.getPlayer());
+                WPData wpData = new WPData(e.getPlayer(), handItem);
+                wpData.removeUses(e.getPlayer(), handItem, 1);
+                wpData.apply(e.getPlayer(), handItem);
+            }
             return;
         }
 
         e.setCancelled(true);
         handItemStack.setDurability((short) 0);
-        e.getPlayer().updateInventory();
 
         ToolUseEvent toolUseEvent;
         switch (wpType) {
-
-            case SPAWNER_PICKAXE:
+            case SPAWNER_PICKAXE: {
                 toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.SPAWNER_PICKAXE, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performSpawnerPickaxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performSpawnerPickaxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            case TRENCH_PICKAXE:
+            }
+            case TRENCH_PICKAXE: {
                 toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.TRENCH_PICKAXE, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performTrenchPickaxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performTrenchPickaxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            case TRENCH_SHOVEL:
+            }
+            case TRENCH_SHOVEL: {
                 toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.TRENCH_SHOVEL, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performTrenchShovelMagic(e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performTrenchShovelMagic(e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            case TRAY_PICKAXE:
-                toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.TRAY_PICKAXE,
-                        pluginInstance.getManager().getHandItem(e.getPlayer()));
+            }
+            case TRAY_PICKAXE: {
+                toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.TRAY_PICKAXE, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performTrayPickaxeMagic(e, e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performTrayPickaxeMagic(e, e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            case HARVESTER_HOE:
+            }
+            case HARVESTER_HOE: {
                 toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.HARVESTER_HOE, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performHarvesterHoeMagic(e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performHarvesterHoeMagic(e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            case HARVESTER_AXE:
+            }
+            case HARVESTER_AXE: {
                 toolUseEvent = new ToolUseEvent(e.getPlayer(), e.getBlock().getLocation(), WPType.HARVESTER_AXE, pluginInstance.getManager().getHandItem(e.getPlayer()));
                 pluginInstance.getServer().getPluginManager().callEvent(toolUseEvent);
-                if (!toolUseEvent.isCancelled())
-                    getFunctionUtil().performHarvesterAxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
+                if (!toolUseEvent.isCancelled()) getFunctionUtil().performHarvesterAxeMagic(e.getPlayer(), e.getBlock(), handItemStack);
                 break;
-
-            default:
-                break;
+            }
+            default: {break;}
         }
     }
 
@@ -394,9 +386,16 @@ public class Listeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onAnvilEnchant(InventoryClickEvent e) {
         if (e.getInventory() instanceof AnvilInventory) {
-            if (e.getRawSlot() == 2 && (pluginInstance.getManager().isWPItem(e.getInventory().getItem(0))
-                    || pluginInstance.getManager().isWPItem(e.getInventory().getItem(1))))
-                e.setCancelled(true);
+            if (e.getRawSlot() == 2) {
+                ItemStack leftSlot = e.getInventory().getItem(0);
+                if (leftSlot != null && pluginInstance.getManager().isWPItem(leftSlot)) {
+                    e.setCancelled(true);
+                    return;
+                }
+
+                ItemStack rightSlot = e.getInventory().getItem(1);
+                if (rightSlot != null && pluginInstance.getManager().isWPItem(rightSlot)) e.setCancelled(true);
+            }
         }
     }
 
@@ -467,34 +466,44 @@ public class Listeners implements Listener {
         if (e.getClick() == ClickType.DOUBLE_CLICK || !pluginInstance.getConfig().getBoolean("general-section.tool-merging")
                 || !(e.getWhoClicked() instanceof Player)) return;
 
-        if (e.getCursor() != null && e.getCurrentItem() != null && pluginInstance.getManager().isWPItem(e.getCursor())
-                && pluginInstance.getManager().isWPItem(e.getCurrentItem())) {
-
-            final WPType wpType1 = pluginInstance.getManager().getWPItemType(e.getCursor()), wpType2 = pluginInstance.getManager().getWPItemType(e.getCurrentItem());
+        final Player player = (Player) e.getWhoClicked();
+        if (e.getCursor() != null && !e.getCursor().getType().name().contains("AIR") && e.getCurrentItem() != null && !e.getCurrentItem().getType().name().contains("AIR")
+                && pluginInstance.getManager().isWPItem(e.getCursor()) && pluginInstance.getManager().isWPItem(e.getCurrentItem())) {
+            final WPType wpType1 = pluginInstance.getManager().getWPItemType(player, e.getCursor()),
+                    wpType2 = pluginInstance.getManager().getWPItemType(player, e.getCurrentItem());
             if (wpType2 == null || wpType1 != wpType2) return;
 
             if (pluginInstance.getManager().getItemRadius(e.getCurrentItem()) != pluginInstance.getManager().getItemRadius(e.getCursor())
-                    || pluginInstance.getManager().getItemModifier(e.getCurrentItem()) != pluginInstance.getManager().getItemModifier(e.getCursor()))
-                return;
+                    || pluginInstance.getManager().getItemModifier(e.getCurrentItem()) != pluginInstance.getManager().getItemModifier(e.getCursor())) return;
 
-            final int useCount1 = pluginInstance.getManager().getItemUses(e.getCursor()),
-                    useCount2 = pluginInstance.getManager().getItemUses(e.getCurrentItem());
-            if (useCount1 == -1 || useCount2 == -1) return;
+            final ItemStack itemOnCursor = e.getCursor().clone(), clickedItem = e.getCurrentItem().clone();
 
+            NBTItem cursorNBT = new NBTItem(itemOnCursor), clickedNBT = new NBTItem(clickedItem);
+            if (!cursorNBT.hasTag("fwp-uses") || !clickedNBT.hasTag("fwp-uses")) return;
+
+            final int cursorUses = cursorNBT.getInteger("fwp-uses"),
+                    clickedUses = clickedNBT.getInteger("fwp-uses");
+
+            System.out.println(e.getCurrentItem().getType() + " | " + cursorNBT);
+            System.out.println(e.getCursor().getType() + " | " + clickedNBT);
             e.setCancelled(true);
-            if (e.getCursor().getAmount() > 1) e.getCursor().setAmount(e.getCursor().getAmount() - 1);
-            else e.setCursor(null);
 
-            pluginInstance.getManager().addItemUses(e.getCurrentItem(), useCount1);
-            ((Player) e.getWhoClicked()).updateInventory();
+            if (itemOnCursor.getAmount() > 1) {
+                itemOnCursor.setAmount(itemOnCursor.getAmount() - 1);
+                player.setItemOnCursor(itemOnCursor);
+            } else player.setItemOnCursor(null);
+
+            WPData wpData = new WPData(player, e.getCurrentItem());
+            wpData.setUses(cursorUses + clickedUses);
+            wpData.apply(player, e.getCurrentItem());
         }
     }
 
     // helping methods
     private void checkSpartan(Player player) {
         if (!pluginInstance.getConfig().getBoolean("general-section.cancel-spartan-click")) {
-            Plugin plugin1 = pluginInstance.getServer().getPluginManager().getPlugin("SpartanAPI");
-            if (plugin1 != null) {
+            Plugin spartanAPI = pluginInstance.getServer().getPluginManager().getPlugin("SpartanAPI");
+            if (spartanAPI != null) {
                 try {
                     Class<?> apiClass = Class.forName("me.vagdedes.spartan.api.API"),
                             hackTypeClass = Class.forName("me.vagdedes.spartan.system.Enums$HackType");
@@ -503,15 +512,11 @@ public class Listeners implements Listener {
                     Field enumTypeField = hackTypeClass.getField("FastClicks");
 
                     cancelCheckMethod.invoke(null, player, enumTypeField, 40);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                } catch (Exception e) {e.printStackTrace();}
             }
         }
     }
 
     // getters & setters
-    private FunctionUtil getFunctionUtil() {
-        return functionUtil;
-    }
+    private FunctionUtil getFunctionUtil() {return functionUtil;}
 }

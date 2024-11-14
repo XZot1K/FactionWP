@@ -28,7 +28,7 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender commandSender, Command command, @NotNull String alias, String[] args) {
         if (command.getName().equalsIgnoreCase("factionwp")) {
             switch (args.length) {
-                case 1:
+                case 1: {
                     if (args[0].equalsIgnoreCase("reload")) {
                         runReloadCommand(commandSender);
                         return true;
@@ -42,34 +42,47 @@ public class Commands implements CommandExecutor {
 
                     sendUsageMessage(commandSender);
                     break;
-                case 4:
+                }
+                case 4: {
                     if (args[0].equalsIgnoreCase("give")) {
-                        runGiveCommand(commandSender, args[1], args[2], args[3]);
+                        runGiveCommand(commandSender, args[1], args[2], args[3]); // amount
                         return true;
                     }
 
                     sendUsageMessage(commandSender);
                     break;
-                case 5:
+                }
+                case 5: {
                     if (args[0].equalsIgnoreCase("give")) {
-                        runGiveCommand(commandSender, args[1], args[2], args[3], args[4]);
+                        runGiveCommand(commandSender, args[1], args[2], args[3], args[4]); // amount + uses
                         return true;
                     }
 
                     sendUsageMessage(commandSender);
                     break;
-                case 6:
+                }
+                case 6: {
                     if (args[0].equalsIgnoreCase("give")) {
-                        runGiveCommand(commandSender, args[1], args[2], args[3], args[4], args[5]);
+                        runGiveCommand(commandSender, args[1], args[2], args[3], args[4], args[5]); // amount + uses + <radius or modifier>
                         return true;
                     }
 
                     sendUsageMessage(commandSender);
                     break;
-                default:
+                }
+                case 7: {
+                    if (args[0].equalsIgnoreCase("give")) {
+                        runGiveCommand(commandSender, args[1], args[2], args[3], args[4], args[5], args[6]); // amount + uses + radius + modifier
+                        return true;
+                    }
 
                     sendUsageMessage(commandSender);
                     break;
+                }
+                default: {
+                    sendUsageMessage(commandSender);
+                    break;
+                }
             }
 
             return true;
@@ -102,186 +115,108 @@ public class Commands implements CommandExecutor {
         pluginInstance.getManager().sendCustomMessage(commandSender, "list-message", "{types}:" + Arrays.toString(WPType.values()));
     }
 
-    private void runGiveCommand(CommandSender commandSender, String playerString, String typeString, String amountString) {
+    private void runGiveCommand(CommandSender commandSender, String... parameters) {
         if (!commandSender.hasPermission("factionwp.give")) {
             pluginInstance.getManager().sendCustomMessage(commandSender, "no-permission-message");
             return;
         }
 
-        Player player = pluginInstance.getServer().getPlayer(playerString);
+        Player player = pluginInstance.getServer().getPlayer(parameters[0]);
         if (player != null) {
-            final String entry = typeString.replace(" ", "_").replace("-", "_");
-            WPType wpType = null;
-            for (int i = -1; ++i < WPType.values().length; ) {
-                WPType wt = WPType.values()[i];
-                if (wt.name().equalsIgnoreCase(entry)) {
-                    wpType = wt;
-                    break;
-                }
-            }
-
+            final String entry = parameters[1].replace(" ", "_").replace("-", "_");
+            final WPType wpType = WPType.getType(entry);
             if (wpType == null) {
                 pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-type-message", "{types}:" + Arrays.toString(WPType.values()));
                 return;
             }
 
-            if (wpType.hasUses()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-requires-uses-message");
-                return;
+            int amount = 1;
+            if (parameters.length >= 3) {
+                if (pluginInstance.getManager().isNotNumeric(parameters[2])) {
+                    pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-amount-message", "{types}:" + Arrays.toString(WPType.values()));
+                    return;
+                } else amount = Integer.parseInt(parameters[2]);
             }
 
-            if (wpType.hasRadius()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-radius-message");
-                return;
+            int uses = -1;
+            if (parameters.length >= 4) {
+                if (parameters[3] != null && !parameters[3].isEmpty()) {
+                    if (!wpType.hasUses()) {
+                        pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-uses-message");
+                        return;
+                    }
+
+                    if (pluginInstance.getManager().isNotNumeric(parameters[3])) {
+                        pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-uses-message");
+                        return;
+                    } else {
+                        uses = Integer.parseInt(parameters[3]);
+                        if (uses < -1) uses = -1;
+                    }
+                } else if (wpType.hasUses()) uses = pluginInstance.getConfig().getInt("global-item-section.predefined-uses");
             }
 
-            int amount;
-            if (pluginInstance.getManager().isNotNumeric(amountString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-amount-message", "{types}:" + Arrays.toString(WPType.values()));
-                return;
-            } else amount = Integer.parseInt(amountString);
+            int radius = -1;
+            double modifier = 1;
 
-            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, -1, -1, 1);
-            if (player.getInventory().firstEmpty() == -1)
-                player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
-            else
-                player.getInventory().addItem(itemStack);
+            if (parameters.length >= 5) {
+                if (parameters[4] != null && !parameters[4].isEmpty()) {
+                    if (!wpType.hasRadius() && !wpType.hasModifier()) {
+                        pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-radius-message");
+                        return;
+                    }
 
-            String formattedTypeName = WordUtils.capitalize(wpType.name().toLowerCase().replace("_", " "));
-            pluginInstance.getManager().sendCustomMessage(commandSender, "given-message", "{player}:" + player.getName(), "{amount}:" + amount, "{type}:" + formattedTypeName);
-            pluginInstance.getManager().sendCustomMessage(player, "received-message", "{amount}:" + amount, "{type}:" + formattedTypeName);
-        } else pluginInstance.getManager().sendCustomMessage(commandSender, "player-invalid-message");
-    }
-
-    private void runGiveCommand(CommandSender commandSender, String playerString, String typeString, String amountString, String usesString) {
-        if (!commandSender.hasPermission("factionwp.give")) {
-            pluginInstance.getManager().sendCustomMessage(commandSender, "no-permission-message");
-            return;
-        }
-
-        Player player = pluginInstance.getServer().getPlayer(playerString);
-        if (player != null) {
-            final String entry = typeString.replace(" ", "_").replace("-", "_");
-            WPType wpType = null;
-            for (int i = -1; ++i < WPType.values().length; ) {
-                WPType wt = WPType.values()[i];
-                if (wt.name().equalsIgnoreCase(entry)) {
-                    wpType = wt;
-                    break;
-                }
-            }
-
-            if (wpType == null) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-type-message", "{types}:" + Arrays.toString(WPType.values()));
-                return;
-            }
-
-            int amount;
-
-            if (pluginInstance.getManager().isNotNumeric(amountString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-amount-message", "{types}:" + Arrays.toString(WPType.values()));
-                return;
-            } else amount = Integer.parseInt(amountString);
-
-            if (!wpType.hasUses()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-uses-message");
-                return;
-            }
-
-            if (wpType.hasRadius()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-requires-radius-message");
-                return;
-            }
-
-            int uses;
-            if (pluginInstance.getManager().isNotNumeric(usesString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-uses-message");
-                return;
-            } else {
-                uses = Integer.parseInt(usesString);
-                if (uses < -1) uses = -1;
-            }
-
-            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, uses, -1, 1);
-            if (player.getInventory().firstEmpty() == -1)
-                player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
-            else
-                player.getInventory().addItem(itemStack);
-
-            String formattedTypeName = WordUtils.capitalize(wpType.name().toLowerCase().replace("_", " "));
-            pluginInstance.getManager().sendCustomMessage(commandSender, "given-message", "{player}:" + player.getName(), "{amount}:" + amount, "{type}:" + formattedTypeName);
-            pluginInstance.getManager().sendCustomMessage(player, "received-message", "{amount}:" + amount, "{type}:" + formattedTypeName);
-        } else pluginInstance.getManager().sendCustomMessage(commandSender, "player-invalid-message");
-    }
-
-    private void runGiveCommand(CommandSender commandSender, String playerString, String typeString, String amountString, String usesString, String radiusString) {
-        if (!commandSender.hasPermission("factionwp.give")) {
-            pluginInstance.getManager().sendCustomMessage(commandSender, "no-permission-message");
-            return;
-        }
-
-        Player player = pluginInstance.getServer().getPlayer(playerString);
-        if (player != null) {
-            final String entry = typeString.replace(" ", "_").replace("-", "_");
-            WPType wpType = null;
-            for (int i = -1; ++i < WPType.values().length; ) {
-                WPType wt = WPType.values()[i];
-                if (wt.name().equalsIgnoreCase(entry)) {
-                    wpType = wt;
-                    break;
-                }
-            }
-
-            if (wpType == null) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-type-message", "{types}:" + Arrays.toString(WPType.values()));
-                return;
-            }
-
-            int amount;
-            if (pluginInstance.getManager().isNotNumeric(amountString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-amount-message", "{types}:" + Arrays.toString(WPType.values()));
-                return;
-            } else amount = Integer.parseInt(amountString);
-
-            if (!wpType.hasUses()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-uses-message");
-                return;
-            }
-
-            if (!wpType.hasRadius() && !wpType.hasModifier()) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-radius-message");
-                return;
-            }
-
-            int uses;
-            double radius;
-
-            if (pluginInstance.getManager().isNotNumeric(usesString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-uses-message");
-                return;
-            } else {
-                uses = Integer.parseInt(usesString);
-                if (uses < -1) uses = -1;
-            }
-
-            if (pluginInstance.getManager().isNotNumeric(radiusString)) {
-                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-radius-message");
-                return;
-            } else {
-                radius = Double.parseDouble(radiusString);
-                if (radius <= 0) {
-                    pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-radius-message");
+                    if (!wpType.hasModifier()) {
+                        if (pluginInstance.getManager().isNotNumeric(parameters[4])) {
+                            pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-radius-message");
+                            return;
+                        } else {
+                            radius = Integer.parseInt(parameters[4]);
+                            if (radius <= 0) {
+                                pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-radius-message");
+                                return;
+                            }
+                        }
+                    } else {
+                        if (pluginInstance.getManager().isNotNumeric(parameters[4])) {
+                            pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-modifier-message");
+                            return;
+                        } else {
+                            modifier = Double.parseDouble(parameters[4]);
+                            if (modifier < -1) modifier = 1;
+                        }
+                    }
+                } else if (wpType.hasRadius()) {
+                    pluginInstance.getManager().sendCustomMessage(commandSender, "type-requires-radius-message");
                     return;
                 }
             }
 
-            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, uses, (int) radius, radius);
-            if (player.getInventory().firstEmpty() == -1)
-                player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
-            else
-                player.getInventory().addItem(itemStack);
-        } else
-            pluginInstance.getManager().sendCustomMessage(commandSender, "player-invalid-message");
+            if (parameters.length >= 6) {
+                if (parameters[5] != null && parameters[5].isEmpty()) {
+                    if (wpType.hasModifier()) {
+                        if (pluginInstance.getManager().isNotNumeric(parameters[5])) {
+                            pluginInstance.getManager().sendCustomMessage(commandSender, "invalid-modifier-message");
+                            return;
+                        } else {
+                            modifier = Double.parseDouble(parameters[5]);
+                            if (modifier < -1) modifier = 1;
+                        }
+                    } else {
+                        pluginInstance.getManager().sendCustomMessage(commandSender, "type-no-modifier-message");
+                        return;
+                    }
+                }
+            }
+
+            ItemStack itemStack = pluginInstance.getManager().buildItem(player, wpType, amount, uses, radius, modifier);
+            if (player.getInventory().firstEmpty() == -1) player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
+            else player.getInventory().addItem(itemStack);
+
+            String formattedTypeName = WordUtils.capitalize(wpType.name().toLowerCase().replace("_", " "));
+            pluginInstance.getManager().sendCustomMessage(commandSender, "given-message", "{player}:" + player.getName(), "{amount}:" + amount, "{type}:" + formattedTypeName);
+            pluginInstance.getManager().sendCustomMessage(player, "received-message", "{amount}:" + amount, "{type}:" + formattedTypeName);
+        } else pluginInstance.getManager().sendCustomMessage(commandSender, "player-invalid-message");
     }
 
     private void runReloadCommand(CommandSender commandSender) {
